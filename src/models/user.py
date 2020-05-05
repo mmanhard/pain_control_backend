@@ -1,0 +1,43 @@
+import json
+import mongoengine as me
+import datetime
+
+def getOptionalUserParams():
+    return ['phone', 'birthday', 'hometown', 'medical_history']
+
+class User(me.Document):
+
+    email = me.StringField(required=True)
+    first_name = me.StringField(max_length=50, required=True)
+    last_name = me.StringField(max_length=50, required=True)
+    hash = me.StringField(required=True)
+    date_joined = me.DateTimeField(required=True, default=datetime.datetime.utcnow)
+
+    phone = me.StringField(max_length=16)
+    birthday = me.StringField()
+    hometown = me.StringField(max_length=50)
+    medical_history = me.StringField(max_length=1000)
+
+    entries = me.ListField(me.ReferenceField('Entry'))
+    # body_parts = me.ListField(me.EmbeddedDocumentField(Body_Part))
+    # typ_medications = me.ListField(me.EmbeddedDocumentField(Medication))
+    # typ_activities = me.ListField(me.EmbeddedDocumentField(Activity))
+
+    def __repr__(self):
+        return json.dumps(self.serialize(), sort_keys=True, indent=4)
+
+    def serialize(self):
+        return {
+            'id': str(self.id),
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'phone': self.phone,
+            'date_joined': int((datetime.datetime.utcnow() - self.date_joined).total_seconds()),
+            'birthday': self.birthday,
+            'hometown': self.hometown,
+            'medical_history': self.medical_history,
+            'num_entries': len(self.entries)
+        }
+
+
