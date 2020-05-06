@@ -87,29 +87,59 @@ def create_user():
     return make_response("Success", 201, {'Content-Type': 'application/json'})
 
 ###########################################################################
-# Read info about a specific user
+# Read info about a specific user - GET
+# /users/<user_id>
+#
+# Optional query parameters:
+# detail_level = low, medium, high (default)
+#
 ###########################################################################
 @users_bp.route('/<uid>/', methods=['GET'])
 # @login_required
 def get_user(uid):
-    if uid is None:
-        return make_response("No user ID Provided", 400, {'Content-Type': 'application/json'})
+    user, err = verify_user(uid)
+    if err is not None:
+        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
 
-    user = User.objects(pk=uid).first()
+    detail_level = 'high'
+    if 'detail_level' in request.args:
+        detail_level = request.args['detail_level']
 
-    if user is None:
-        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
+    return make_response(user.serialize(detail_level=detail_level), 200, {'Content-Type': 'application/json'})
 
-    return make_response(repr(user), 200, {'Content-Type': 'application/json'})
-
+##########################################################################
+# Update user info
 ###########################################################################
-# # Update user info
-# ###########################################################################
-# @users_bp.route('/<uid>', methods=['PATCH'])
+@users_bp.route('/<uid>', methods=['PATCH'])
 # @login_required
-# def modify_user(uid):
-#     return 'User could not be found'
-#
+def modify_user(uid):
+    user, err = verify_user(uid)
+    if err is not None:
+        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+
+    # Check to see if request contains changes to unsupport fields.
+    if 'email' in request.json:
+        return make_response('Changes to email not supported', 400, {'Content-Type': 'application/json'})
+    if 'phone' in request.json:
+        return make_response('Changes to phone number not supported', 400, {'Content-Type': 'application/json'})
+    if 'hash' in request.json:
+        return make_response('Changes to hash not supported', 400, {'Content-Type': 'application/json'})
+    if 'entries' in request.json:
+        return make_response('Changes to entries directly is not supported', 400, {'Content-Type': 'application/json'})
+    if 'body_parts' in request.json:
+        return make_response('Changes to body parts directly is not supported', 400, {'Content-Type': 'application/json'})
+
+    for (key, value) in request.json.items():
+        if key in user and user[key] != value:
+            user[key] = value
+        elif key == 'password':
+            if not valid_password(value):
+                return make_response('Password is invalid!', 400, {'Content-Type': 'application/json'})
+            user['hash'] = generate_password_hash(value)
+
+    user.save()
+    return make_response("User edited succesfully", 200, {'Content-Type': 'application/json'})
+
 # ###########################################################################
 # # Delete user
 # ###########################################################################
@@ -129,6 +159,18 @@ def delete_user(uid):
 ####################################
 # TODO - TODO -TODO Auxiliary functions
 ####################################
+def verify_user(uid):
+    if uid is None:
+        err = {'message': 'No user ID Provided', 'status_code': 400}
+        return None, err
+
+    user = User.objects(pk=uid).first()
+    if user is None:
+        err = {'message': 'This user does not exist', 'status_code': 404}
+        return None, err
+
+    return user, None
+
 def valid_email(email):
     return True
 

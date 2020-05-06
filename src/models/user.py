@@ -24,21 +24,7 @@ class User(me.Document):
     # typ_activities
 
     def __repr__(self):
-        return json.dumps(self.serialize(), sort_keys=True, indent=4)
-
-    def serialize_low_detail(self):
-        return {
-            'id': str(self.id),
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-        }
-
-    def serialize_medium_detail(self):
-        return {
-            'id': str(self.id),
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-        }
+        return json.dumps(self.serialize(), indent=4)
 
     def serialize(self, detail_level='high'):
         serialized = {
@@ -62,7 +48,7 @@ class User(me.Document):
                 'entries': self.getEntryIDs(),
                 'body_parts': self.getBodyPartIDs()
             })
-            
+
         return serialized
 
     def getEntryIDs(self):
