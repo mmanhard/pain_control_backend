@@ -19,14 +19,15 @@ class User(me.Document):
     medical_history = me.StringField(max_length=1000)
 
     entries = me.ListField(me.ReferenceField('Entry'))
-    # body_parts = me.ListField(me.EmbeddedDocumentField(Body_Part))
-    # typ_medications = me.ListField(me.EmbeddedDocumentField(Medication))
-    # typ_activities = me.ListField(me.EmbeddedDocumentField(Activity))
+    body_parts = me.ListField(me.ReferenceField('BodyPart'))
+    # typ_medications
+    # typ_activities
 
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
     def serialize(self):
+
         return {
             'id': str(self.id),
             'first_name': self.first_name,
@@ -37,7 +38,24 @@ class User(me.Document):
             'birthday': self.birthday,
             'hometown': self.hometown,
             'medical_history': self.medical_history,
-            'num_entries': len(self.entries)
+            'entries': self.getEntryIDs(),
+            'body_parts': self.getBodyPartIDs()
         }
+
+    def getEntryIDs(self):
+        all_entries = self.entries
+        entryIDs = []
+        for entry_ref in all_entries:
+            entryIDs.append(str(entry_ref.id))
+
+        return entryIDs
+
+    def getBodyPartIDs(self):
+        all_body_parts = self.body_parts
+        body_partIDs = []
+        for body_part_ref in all_body_parts:
+            body_partIDs.append(str(body_part_ref.id))
+
+        return body_partIDs
 
 
