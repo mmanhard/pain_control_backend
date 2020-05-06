@@ -26,21 +26,44 @@ class User(me.Document):
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
-    def serialize(self):
-
+    def serialize_low_detail(self):
         return {
             'id': str(self.id),
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'email': self.email,
-            'phone': self.phone,
-            'date_joined': int((datetime.datetime.utcnow() - self.date_joined).total_seconds()),
-            'birthday': self.birthday,
-            'hometown': self.hometown,
-            'medical_history': self.medical_history,
-            'entries': self.getEntryIDs(),
-            'body_parts': self.getBodyPartIDs()
         }
+
+    def serialize_medium_detail(self):
+        return {
+            'id': str(self.id),
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+        }
+
+    def serialize(self, detail_level='high'):
+        serialized = {
+            'id': str(self.id),
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+        }
+
+        if detail_level == 'medium' or detail_level == 'high':
+            serialized.update({
+                'email': self.email,
+                'phone': self.phone,
+                'date_joined': int((datetime.datetime.utcnow() - self.date_joined).total_seconds()),
+            })
+
+        if detail_level == 'high':
+            serialized.update({
+                'birthday': self.birthday,
+                'hometown': self.hometown,
+                'medical_history': self.medical_history,
+                'entries': self.getEntryIDs(),
+                'body_parts': self.getBodyPartIDs()
+            })
+            
+        return serialized
 
     def getEntryIDs(self):
         all_entries = self.entries
