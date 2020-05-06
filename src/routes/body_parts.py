@@ -16,16 +16,16 @@ def create_entry(uid):
 
     # Check all required fields are provided.
     if 'name' not in request.form:
-        return make_response('No name provided!', 400)
+        return make_response('No name provided!', 400, {'Content-Type': 'application/json'})
     if 'type' not in request.form:
-        return make_response('No type provided!', 400)
+        return make_response('No type provided!', 400, {'Content-Type': 'application/json'})
     if uid is None:
-        return make_response("No user ID Provided", 400)
+        return make_response("No user ID Provided", 400, {'Content-Type': 'application/json'})
 
     # Check user id provided exists.
     user = User.objects(pk=uid).first()
     if user is None:
-        return make_response("This user does not exist", 404)
+        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
 
     # Create the body_part.
     new_part = BodyPart(
@@ -37,7 +37,7 @@ def create_entry(uid):
     new_part.save()
     user.update(push__body_parts=new_part)
 
-    return make_response("Success", 201)
+    return make_response("Success", 201, {'Content-Type': 'application/json'})
 
 ##########################################################################
 # Get body parts
@@ -48,11 +48,11 @@ def get_user(uid, bpid):
     # Check entry id provided exists.
     body_part = BodyPart.objects(pk=bpid).first()
     if body_part is None:
-        return make_response("This body part does not exist", 404)
+        return make_response("This body part does not exist", 404, {'Content-Type': 'application/json'})
 
     # Check user id provided exists.
     user = User.objects(pk=uid).first()
     if user is None:
-        return make_response("This user does not exist", 404)
+        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
 
-    return make_response(repr(body_part), 200)
+    return make_response(repr(body_part), 200, {'Content-Type': 'application/json'})
