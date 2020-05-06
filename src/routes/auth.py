@@ -4,9 +4,9 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 import functools
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-@bp.route('/register', methods=('GET', 'POST'))
+@auth_bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
         return "Attempt to register user"
@@ -36,7 +36,7 @@ def register():
 
     return "User registration will be passed here"
 
-@bp.route('/login', methods=('GET', 'POST'))
+@auth_bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
         return "Attempt to login user"
@@ -62,7 +62,7 @@ def login():
 
     return "User login info be passed here"
 
-# @bp.before_app_request
+# @auth_bp.before_app_request
 # def load_logged_in_user():
 #     user_id = session.get('user_id')
 #
@@ -73,7 +73,7 @@ def login():
 #             'SELECT * FROM user WHERE id = ?', (user_id,)
 #         ).fetchone()
 
-@bp.route('/logout')
+@auth_bp.route('/logout')
 def logout():
     # session.clear()
     return "User logging out"

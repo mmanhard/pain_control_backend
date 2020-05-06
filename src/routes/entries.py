@@ -3,15 +3,16 @@ from werkzeug.security import generate_password_hash
 from mongoengine import *
 import json
 
-from ..models.entry import Entry
 from ..models.user import User
+from ..models.subentry import SubEntry, MoodSubEntry
+from ..models.entry import Entry
 
-bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
+entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 
 ###########################################################################
 # Get all entries for a given user
 ###########################################################################
-@bp.route('/', methods=['GET'])
+@entries_bp.route('/', methods=['GET'])
 def index(uid):
     all_entries = Entry.objects()
     s = []
@@ -22,12 +23,14 @@ def index(uid):
 ##########################################################################
 # Create new entry
 ###########################################################################
-@bp.route('/', methods=['POST'])
+@entries_bp.route('/', methods=['POST'])
 def create_entry(uid):
 
     # Check all required fields are provided.
     if 'notes' not in request.form:
         return make_response('No notes provided!', 400)
+    if 'subentry_notes' not in request.form:
+        return make_response('No subentry notes provided!', 400)
     if uid is None:
         return make_response("No user ID Provided", 400)
 
@@ -36,10 +39,18 @@ def create_entry(uid):
     if user is None:
         return make_response("This user does not exist", 404)
 
+    # Create the pain subentry.
+    # if 'body_'
+    # body_part
+    # # subentry = PainSubEntry(
+    # notes = request.form['subentry_notes'],
+    # mood = 'sad'
+    # )
+
     # Create the entry and save a reference to it in the user db.
     newentry = Entry(
     user = user,
-    notes = request.form['notes'],
+    notes = request.form['notes']
     )
     newentry.save()
     user.update(push__entries=newentry)
@@ -49,7 +60,7 @@ def create_entry(uid):
 ##########################################################################
 # Get entry details
 ###########################################################################
-@bp.route('/<eid>', methods=['GET'])
+@entries_bp.route('/<eid>/', methods=['GET'])
 # @login_required
 def get_user(uid, eid):
     # Check entry id provided exists.
@@ -67,7 +78,7 @@ def get_user(uid, eid):
 ##########################################################################
 # Delete entry
 ###########################################################################
-@bp.route('/<eid>', methods=['DELETE'])
+@entries_bp.route('/<eid>/', methods=['DELETE'])
 def delete_entry(uid,eid):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
