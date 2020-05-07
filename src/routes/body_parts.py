@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 from mongoengine import *
 import json
 
+from .users import verify_user
 from ..models.user import User
 from ..models.body_part import BodyPart
 
@@ -13,7 +14,6 @@ body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_
 ###########################################################################
 @body_parts_bp.route('/', methods=['POST'])
 def create_entry(uid):
-
     # Check all required fields are provided.
     if 'name' not in request.form:
         return make_response('No name provided!', 400, {'Content-Type': 'application/json'})
@@ -23,9 +23,9 @@ def create_entry(uid):
         return make_response("No user ID Provided", 400, {'Content-Type': 'application/json'})
 
     # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
+    user, err = verify_user(uid)
+    if err is not None:
+        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
 
     # Create the body_part.
     new_part = BodyPart(
@@ -51,8 +51,8 @@ def get_user(uid, bpid):
         return make_response("This body part does not exist", 404, {'Content-Type': 'application/json'})
 
     # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
+    user, err = verify_user(uid)
+    if err is not None:
+        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
 
     return make_response(repr(body_part), 200, {'Content-Type': 'application/json'})

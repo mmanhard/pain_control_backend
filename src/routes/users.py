@@ -146,10 +146,9 @@ def modify_user(uid):
 @users_bp.route('/<uid>', methods=['DELETE'])
 # @login_required
 def delete_user(uid):
-    # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404, {'Content-Type': 'application/json'})
+    user, err = verify_user(uid)
+    if err is not None:
+        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
 
     user.delete()
 
