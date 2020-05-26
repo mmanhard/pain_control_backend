@@ -4,7 +4,7 @@ from mongoengine import *
 import json
 
 from ..models.user import User
-from .auth import login_required
+from .auth import login_required, valid_password
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -33,10 +33,6 @@ def index():
 @users_bp.route('/<uid>/', methods=['GET'])
 @login_required
 def get_user(uid, user):
-    user, err = verify_user(uid)
-    if err is not None:
-        return make_response(err['message'], err['status_code'])
-
     detail_level = 'high'
     if 'detail_level' in request.args:
         detail_level = request.args['detail_level']
@@ -49,10 +45,6 @@ def get_user(uid, user):
 @users_bp.route('/<uid>', methods=['PATCH'])
 @login_required
 def modify_user(uid, user):
-    user, err = verify_user(uid)
-    if err is not None:
-        return make_response(err['message'], err['status_code'])
-
     # Check to see if request contains changes to unsupport fields.
     if 'email' in request.json:
         return make_response('Changes to email not supported', 400)
@@ -82,35 +74,6 @@ def modify_user(uid, user):
 @users_bp.route('/<uid>', methods=['DELETE'])
 @login_required
 def delete_user(uid, user):
-    user, err = verify_user(uid)
-    if err is not None:
-        return make_response(err['message'], err['status_code'])
-
     user.delete()
 
     return make_response("User successfully deleted", 200)
-
-
-####################################
-# TODO - TODO -TODO Auxiliary functions
-####################################
-def verify_user(uid):
-    if uid is None:
-        err = {'message': 'No user ID Provided', 'status_code': 400}
-        return None, err
-
-    user = User.objects(pk=uid).first()
-    if user is None:
-        err = {'message': 'This user does not exist', 'status_code': 404}
-        return None, err
-
-    return user, None
-
-def valid_email(email):
-    return True
-
-def valid_phone(phone):
-    return True
-
-def valid_password(password):
-    return True

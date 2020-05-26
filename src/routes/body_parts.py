@@ -1,7 +1,7 @@
 from flask import Blueprint, request, make_response
 from mongoengine import *
 
-from .users import verify_user
+from .auth import login_required
 from ..models.user import User
 from ..models.body_part import BodyPart
 
@@ -11,7 +11,8 @@ body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_
 # Create new body part
 ###########################################################################
 @body_parts_bp.route('/', methods=['POST'])
-def create_entry(uid):
+@login_required
+def create_entry(uid, user):
     # Check all required fields are provided.
     if 'name' not in request.form:
         return make_response('No name provided!', 400)
@@ -19,11 +20,6 @@ def create_entry(uid):
         return make_response('No type provided!', 400)
     if uid is None:
         return make_response("No user ID Provided", 400)
-
-    # Check user id provided exists.
-    user, err = verify_user(uid)
-    if err is not None:
-        return make_response(err['message'], err['status_code'])
 
     # Create the body_part.
     new_part = BodyPart(
@@ -41,16 +37,11 @@ def create_entry(uid):
 # Get body parts
 ###########################################################################
 @body_parts_bp.route('/<bpid>/', methods=['GET'])
-# @login_required
-def get_user(uid, bpid):
+@login_required
+def get_user(uid, bpid, user):
     # Check entry id provided exists.
     body_part = BodyPart.objects(pk=bpid).first()
     if body_part is None:
         return make_response("This body part does not exist", 404)
-
-    # Check user id provided exists.
-    user, err = verify_user(uid)
-    if err is not None:
-        return make_response(err['message'], err['status_code'])
 
     return make_response(repr(body_part), 200)

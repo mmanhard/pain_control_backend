@@ -166,8 +166,8 @@ def login_required(f):
                 return make_response('Access forbidden', 403)
 
             user, err = verify_user(message)
-            if user == None:
-                return make_response(err, 404)
+            if err is not None:
+                return make_response(err['message'], err['status_code'])
             else:
                 return f(*args, user=user, **kwargs)
         else:

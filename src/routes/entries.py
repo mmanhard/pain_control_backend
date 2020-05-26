@@ -2,6 +2,7 @@ from flask import Blueprint, request, make_response
 from mongoengine import *
 import json
 
+from .auth import login_required
 from ..models.user import User
 from ..models.subentry import SubEntry, MoodSubEntry
 from ..models.entry import Entry
@@ -12,7 +13,8 @@ entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 # Get all entries for a given user
 ###########################################################################
 @entries_bp.route('/', methods=['GET'])
-def index(uid):
+@login_required
+def index(uid, user):
     all_entries = Entry.objects()
     s = []
     for e in all_entries:
@@ -23,7 +25,8 @@ def index(uid):
 # Create new entry
 ###########################################################################
 @entries_bp.route('/', methods=['POST'])
-def create_entry(uid):
+@login_required
+def create_entry(uid, user):
 
     # Check all required fields are provided.
     if 'notes' not in request.form:
@@ -32,11 +35,6 @@ def create_entry(uid):
         return make_response('No subentry notes provided!', 400)
     if uid is None:
         return make_response("No user ID Provided", 400)
-
-    # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404)
 
     # Create the pain subentry.
     # if 'body_'
@@ -60,17 +58,12 @@ def create_entry(uid):
 # Get entry details
 ###########################################################################
 @entries_bp.route('/<eid>/', methods=['GET'])
-# @login_required
-def get_user(uid, eid):
+@login_required
+def get_user(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
         return make_response("This entry does not exist", 404)
-
-    # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404)
 
     return make_response(repr(entry), 200)
 
@@ -78,16 +71,12 @@ def get_user(uid, eid):
 # Delete entry
 ###########################################################################
 @entries_bp.route('/<eid>/', methods=['DELETE'])
-def delete_entry(uid,eid):
+@login_required
+def delete_entry(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
         return make_response("This entry does not exist", 404)
-
-    # Check user id provided exists.
-    user = User.objects(pk=uid).first()
-    if user is None:
-        return make_response("This user does not exist", 404)
 
     entry.delete()
 
