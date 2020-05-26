@@ -22,22 +22,6 @@ def index():
         s.append(u.serialize(detail_level=detail_level))
     return make_response(json.dumps(s, indent=4), 200)
 
-##########################################################################
-# Create new user - POST
-# /users/
-#
-# Required body keys:
-# email, first_name, last_name, password
-#
-# Optional body keys:
-# phone, birthday, hometown, medical_history
-#
-###########################################################################
-@users_bp.route('/', methods=['POST'])
-def create_user():
-
-    return make_response('Not supported', 404)
-
 ###########################################################################
 # Read info about a specific user - GET
 # /users/<user_id>
@@ -92,9 +76,9 @@ def modify_user(uid, user):
     user.save()
     return make_response("User edited succesfully", 200)
 
-# ###########################################################################
-# # Delete user
-# ###########################################################################
+###########################################################################
+# Delete user
+###########################################################################
 @users_bp.route('/<uid>', methods=['DELETE'])
 @login_required
 def delete_user(uid, user):
