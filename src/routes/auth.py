@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 import functools
 import jwt
@@ -68,7 +68,7 @@ def register():
         return make_response('Could not create token.', 401)
 
 
-    return make_response(jsonify(responseObject), 201)
+    return make_response(responseObject, 201)
 
 @auth_bp.route('/login/', methods=['POST'])
 def login():
@@ -98,7 +98,7 @@ def login():
         except Exception as e:
             return make_response('Could not create token.', 401)
 
-        return make_response(jsonify(responseObject)), 200
+        return make_response(responseObject), 200
     else:
         return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 
@@ -123,7 +123,7 @@ def verify_login():
                 'email': user.email
             }
         }
-        return make_response(jsonify(responseObject)), 200
+        return make_response(responseObject), 200
     else:
         return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 
@@ -147,7 +147,7 @@ def logout():
                 'status': 'fail',
                 'message': e
             }
-            return make_response(jsonify(responseObject), 200)
+            return make_response(responseObject, 200)
     else:
         return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 

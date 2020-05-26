@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, make_response
 from mongoengine import *
 
 from .users import verify_user
