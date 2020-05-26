@@ -60,6 +60,7 @@ def register():
     try:
         auth_token = newuser.encodeAuthToken()
         responseObject = {
+            'user_info': newuser.serialize(detail_level='low'),
             'status': 'success',
             'message': 'Successfully registered.',
             'auth_token': auth_token.decode()
@@ -91,6 +92,7 @@ def login():
         try:
             auth_token = user.encodeAuthToken()
             responseObject = {
+                'user_info': user.serialize(detail_level='low'),
                 'status': 'success',
                 'message': 'Successfully logged in.',
                 'auth_token': auth_token.decode()
