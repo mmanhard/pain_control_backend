@@ -14,16 +14,16 @@ body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_
 def create_entry(uid):
     # Check all required fields are provided.
     if 'name' not in request.form:
-        return make_response('No name provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No name provided!', 400)
     if 'type' not in request.form:
-        return make_response('No type provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No type provided!', 400)
     if uid is None:
-        return make_response("No user ID Provided", 400, {'Content-Type': 'application/json'})
+        return make_response("No user ID Provided", 400)
 
     # Check user id provided exists.
     user, err = verify_user(uid)
     if err is not None:
-        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+        return make_response(err['message'], err['status_code'])
 
     # Create the body_part.
     new_part = BodyPart(
@@ -35,7 +35,7 @@ def create_entry(uid):
     new_part.save()
     user.update(push__body_parts=new_part)
 
-    return make_response("Success", 201, {'Content-Type': 'application/json'})
+    return make_response("Success", 201)
 
 ##########################################################################
 # Get body parts
@@ -46,11 +46,11 @@ def get_user(uid, bpid):
     # Check entry id provided exists.
     body_part = BodyPart.objects(pk=bpid).first()
     if body_part is None:
-        return make_response("This body part does not exist", 404, {'Content-Type': 'application/json'})
+        return make_response("This body part does not exist", 404)
 
     # Check user id provided exists.
     user, err = verify_user(uid)
     if err is not None:
-        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+        return make_response(err['message'], err['status_code'])
 
-    return make_response(repr(body_part), 200, {'Content-Type': 'application/json'})
+    return make_response(repr(body_part), 200)

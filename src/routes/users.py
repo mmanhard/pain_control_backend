@@ -20,7 +20,7 @@ def index():
     s = []
     for u in all_users:
         s.append(u.serialize(detail_level=detail_level))
-    return make_response(json.dumps(s, indent=4), 200, {'Content-Type': 'application/json'})
+    return make_response(json.dumps(s, indent=4), 200)
 
 ##########################################################################
 # Create new user - POST
@@ -36,7 +36,7 @@ def index():
 @users_bp.route('/', methods=['POST'])
 def create_user():
 
-    return make_response('Not supported', 404, {'Content-Type': 'application/json'})
+    return make_response('Not supported', 404)
 
 ###########################################################################
 # Read info about a specific user - GET
@@ -51,13 +51,13 @@ def create_user():
 def get_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
-        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+        return make_response(err['message'], err['status_code'])
 
     detail_level = 'high'
     if 'detail_level' in request.args:
         detail_level = request.args['detail_level']
 
-    return make_response(user.serialize(detail_level=detail_level), 200, {'Content-Type': 'application/json'})
+    return make_response(user.serialize(detail_level=detail_level), 200)
 
 ##########################################################################
 # Update user info
@@ -67,30 +67,30 @@ def get_user(uid, user):
 def modify_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
-        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+        return make_response(err['message'], err['status_code'])
 
     # Check to see if request contains changes to unsupport fields.
     if 'email' in request.json:
-        return make_response('Changes to email not supported', 400, {'Content-Type': 'application/json'})
+        return make_response('Changes to email not supported', 400)
     if 'phone' in request.json:
-        return make_response('Changes to phone number not supported', 400, {'Content-Type': 'application/json'})
+        return make_response('Changes to phone number not supported', 400)
     if 'hash' in request.json:
-        return make_response('Changes to hash not supported', 400, {'Content-Type': 'application/json'})
+        return make_response('Changes to hash not supported', 400)
     if 'entries' in request.json:
-        return make_response('Changes to entries directly is not supported', 400, {'Content-Type': 'application/json'})
+        return make_response('Changes to entries directly is not supported', 400)
     if 'body_parts' in request.json:
-        return make_response('Changes to body parts directly is not supported', 400, {'Content-Type': 'application/json'})
+        return make_response('Changes to body parts directly is not supported', 400)
 
     for (key, value) in request.json.items():
         if key in user and user[key] != value:
             user[key] = value
         elif key == 'password':
             if not valid_password(value):
-                return make_response('Password is invalid!', 400, {'Content-Type': 'application/json'})
+                return make_response('Password is invalid!', 400)
             user['hash'] = generate_password_hash(value)
 
     user.save()
-    return make_response("User edited succesfully", 200, {'Content-Type': 'application/json'})
+    return make_response("User edited succesfully", 200)
 
 # ###########################################################################
 # # Delete user
@@ -100,11 +100,11 @@ def modify_user(uid, user):
 def delete_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
-        return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
+        return make_response(err['message'], err['status_code'])
 
     user.delete()
 
-    return make_response("User successfully deleted", 200, {'Content-Type': 'application/json'})
+    return make_response("User successfully deleted", 200)
 
 
 ####################################

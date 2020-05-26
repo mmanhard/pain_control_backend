@@ -12,33 +12,33 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 def register():
     # Verify all required fields are provided.
     if 'email' not in request.json:
-        return make_response('No email provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No email provided!', 400)
     if 'first_name' not in request.json:
-        return make_response('No first name provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No first name provided!', 400)
     if 'last_name' not in request.json:
-        return make_response('No last name provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No last name provided!', 400)
     if 'password' not in request.json:
-        return make_response('No password provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No password provided!', 400)
 
     # Verify email is unique and valid.
     email = request.json['email']
     if User.objects(email=email).count() != 0:
-        return make_response('Email already registered!', 400, {'Content-Type': 'application/json'})
+        return make_response('Email already registered!', 400)
     elif not valid_email(email):
-        return make_response('Email is invalid!', 400, {'Content-Type': 'application/json'})
+        return make_response('Email is invalid!', 400)
 
     # Verify phone number (if provided) is unique and valid.
     if 'phone' in request.json:
         phone = request.json['phone']
         if User.objects(phone=phone).count() != 0:
-            return make_response('Phone number already registered!', 400, {'Content-Type': 'application/json'})
+            return make_response('Phone number already registered!', 400)
         elif not valid_phone(phone):
-            return make_response('Phone number is invalid!', 400, {'Content-Type': 'application/json'})
+            return make_response('Phone number is invalid!', 400)
 
     # Verify provided password is valid and hash it.
     password = request.json['password']
     if not valid_password(password):
-        return make_response('Password is invalid!', 400, {'Content-Type': 'application/json'})
+        return make_response('Password is invalid!', 400)
     hash = generate_password_hash(password)
 
     # Create the user
@@ -65,24 +65,24 @@ def register():
             'auth_token': auth_token.decode()
         }
     except Exception as e:
-        return make_response('Could not create token.', 401, {'Content-Type': 'application/json'})
+        return make_response('Could not create token.', 401)
 
 
-    return make_response(jsonify(responseObject), 201, {'Content-Type': 'application/json'})
+    return make_response(jsonify(responseObject), 201)
 
 @auth_bp.route('/login/', methods=['POST'])
 def login():
     # Verify all required fields are provided.
     if 'email' not in request.json:
-        return make_response('No email provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No email provided!', 400)
     if 'password' not in request.json:
-        return make_response('No password provided!', 400, {'Content-Type': 'application/json'})
+        return make_response('No password provided!', 400)
 
     # Verify user exists.
     email = request.json['email']
     user = User.objects(email=email).first()
     if user == None:
-        return make_response('User does not exist.', 404, {'Content-Type': 'application/json'})
+        return make_response('User does not exist.', 404)
 
     # Verify the p
     password = request.json['password']
@@ -96,7 +96,7 @@ def login():
                 'auth_token': auth_token.decode()
             }
         except Exception as e:
-            return make_response('Could not create token.', 401, {'Content-Type': 'application/json'})
+            return make_response('Could not create token.', 401)
 
         return make_response(jsonify(responseObject)), 200
     else:
@@ -115,7 +115,7 @@ def verify_login():
         print(message)
         user, err = verify_user(message)
         if user == None:
-            return make_response('User does not exist.', 404, {'Content-Type': 'application/json'})
+            return make_response('User does not exist.', 404)
         responseObject = {
             'status': 'success',
             'data': {
@@ -141,7 +141,7 @@ def logout():
             # Add the token to the blacklist.
             blacklist_token = BlacklistToken(token=auth_token)
             blacklist_token.save()
-            return make_response("User logged out succesfully.", 200, {'Content-Type': 'application/json'})
+            return make_response("User logged out succesfully.", 200)
         except Exception as e:
             responseObject = {
                 'status': 'fail',
@@ -163,11 +163,11 @@ def login_required(f):
         success, message = User.decode_auth_token(auth_token)
         if success:
             if 'uid' not in kwargs or kwargs['uid'] != message:
-                return make_response('Access forbidden', 403, {'Content-Type': 'application/json'})
+                return make_response('Access forbidden', 403)
 
             user, err = verify_user(message)
             if user == None:
-                return make_response(err, 404, {'Content-Type': 'application/json'})
+                return make_response(err, 404)
             else:
                 return f(*args, user=user, **kwargs)
         else:

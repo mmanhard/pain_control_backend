@@ -1,5 +1,8 @@
-from flask import Flask
+from flask import Flask, Response
 from flask_cors import CORS
+
+class JSONResponse(Response):
+    default_mimetype = 'application/json'
 
 def create_app():
     from . import models, routes
@@ -7,6 +10,7 @@ def create_app():
     # Create and configure the app
     app = Flask(__name__)
     app.config.from_object('config')
+    app.response_class = JSONResponse
 
     models.init_app(app)
     routes.init_app(app)
