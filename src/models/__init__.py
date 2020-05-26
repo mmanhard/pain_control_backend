@@ -1,5 +1,6 @@
 from flask_mongoengine import MongoEngine
 
+from .blacklist_token import BlacklistToken
 from .user import User
 from .subentry import SubEntry, MoodSubEntry, MedicationSubEntry, ActivitySubEntry, PainSubEntry
 from .entry import Entry

@@ -1,6 +1,10 @@
+from flask import current_app
 import json
 import mongoengine as me
 import datetime
+import jwt
+
+from . import BlacklistToken
 
 def getOptionalUserParams():
     return ['phone', 'birthday', 'hometown', 'medical_history']
@@ -66,5 +70,38 @@ class User(me.Document):
             body_partIDs.append(str(body_part_ref.id))
 
         return body_partIDs
+
+    def encodeAuthToken(self):
+        try:
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=200),
+                'iat': datetime.datetime.utcnow(),
+                'sub': str(self.id)
+            }
+            print(payload['exp'])
+            return jwt.encode(
+                payload,
+                current_app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+        except Exception as e:
+            return e
+
+    @staticmethod
+    def decode_auth_token(auth_token):
+        try:
+            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+            is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
+            if is_blacklisted_token:
+                return False, 'Token blacklisted. Please log in again.'
+            else:
+                return True, payload['sub']
+        except jwt.ExpiredSignatureError:
+            return False, 'Signature expired.'
+        except jwt.InvalidTokenError:
+            return False, 'Invalid token.'
+        except Exception as e:
+            return False, e
+
 
 

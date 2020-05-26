@@ -1,4 +1,4 @@
-from flask import current_app, Blueprint, request, redirect, session, jsonify, render_template, make_response
+from flask import current_app, Blueprint, request, redirect, jsonify, make_response
 from werkzeug.security import generate_password_hash
 from mongoengine import *
 import json
@@ -36,55 +36,7 @@ def index():
 @users_bp.route('/', methods=['POST'])
 def create_user():
 
-    # Verify all required fields are provided.
-    if 'email' not in request.json:
-        return make_response('No email provided!', 400, {'Content-Type': 'application/json'})
-    if 'first_name' not in request.json:
-        return make_response('No first name provided!', 400, {'Content-Type': 'application/json'})
-    if 'last_name' not in request.json:
-        return make_response('No last name provided!', 400, {'Content-Type': 'application/json'})
-    if 'password' not in request.json:
-        return make_response('No password provided!', 400, {'Content-Type': 'application/json'})
-
-    # Verify email is unique and valid.
-    email = request.json['email']
-    if User.objects(email=email).count() != 0:
-        return make_response('Email already registered!', 400, {'Content-Type': 'application/json'})
-    elif not valid_email(email):
-        return make_response('Email is invalid!', 400, {'Content-Type': 'application/json'})
-
-    # Verify phone number (if provided) is unique and valid.
-    if 'phone' in request.json:
-        phone = request.json['phone']
-        if User.objects(phone=phone).count() != 0:
-            return make_response('Phone number already registered!', 400, {'Content-Type': 'application/json'})
-        elif not valid_phone(phone):
-            return make_response('Phone number is invalid!', 400, {'Content-Type': 'application/json'})
-
-    # Verify provided password is valid and hash it.
-    password = request.json['password']
-    if not valid_password(password):
-        return make_response('Password is invalid!', 400, {'Content-Type': 'application/json'})
-    hash = generate_password_hash(password)
-
-    # Create the user
-    newuser = User(
-    email = email,
-    first_name = request.json['first_name'],
-    last_name = request.json['last_name'],
-    hash = hash
-    )
-
-    # Add optional parameters
-    optional_params = getOptionalUserParams()
-    print(optional_params)
-    for param in optional_params:
-        print(param)
-        if param in request.json:
-            newuser[param] = request.json[param]
-
-    newuser.save()
-    return make_response("Success", 201, {'Content-Type': 'application/json'})
+    return make_response('Not supported', 404, {'Content-Type': 'application/json'})
 
 ###########################################################################
 # Read info about a specific user - GET
