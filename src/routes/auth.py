@@ -102,18 +102,6 @@ def login():
     else:
         return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 
-
-# @auth_bp.before_app_request
-# def load_logged_in_user():
-#     user_id = session.get('user_id')
-#
-#     if user_id is None:
-#         g.user = None
-#     else:
-#         g.user = get_db().execute(
-#             'SELECT * FROM user WHERE id = ?', (user_id,)
-#         ).fetchone()
-
 @auth_bp.route('/verify_login/', methods=['GET'])
 def verify_login():
     auth = request.headers.get('Authorization')
