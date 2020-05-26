@@ -100,15 +100,15 @@ def login():
 
         return make_response(responseObject), 200
     else:
-        return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+        return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
 @auth_bp.route('/verify_login/', methods=['GET'])
 def verify_login():
     auth = request.headers.get('Authorization')
     if auth:
-        auth_token = auth.split(" ")[1]
+        auth_token = auth.split(' ')[1]
     else:
-        return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+        return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
     success, message = User.decode_auth_token(auth_token)
     if success:
@@ -125,15 +125,15 @@ def verify_login():
         }
         return make_response(responseObject), 200
     else:
-        return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+        return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
 @auth_bp.route('/logout/', methods=['POST'])
 def logout():
     auth = request.headers.get('Authorization')
     if auth:
-        auth_token = auth.split(" ")[1]
+        auth_token = auth.split(' ')[1]
     else:
-        return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+        return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
     success, err = User.decode_auth_token(auth_token)
     if success:
@@ -141,7 +141,7 @@ def logout():
             # Add the token to the blacklist.
             blacklist_token = BlacklistToken(token=auth_token)
             blacklist_token.save()
-            return make_response("User logged out succesfully.", 200)
+            return make_response('User logged out succesfully.', 200)
         except Exception as e:
             responseObject = {
                 'status': 'fail',
@@ -149,16 +149,16 @@ def logout():
             }
             return make_response(responseObject, 200)
     else:
-        return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+        return make_response(err, 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
 def login_required(f):
     @functools.wraps(f)
     def verify_login_wrapper(*args, **kwargs):
         auth = request.headers.get('Authorization')
         if auth:
-            auth_token = auth.split(" ")[1]
+            auth_token = auth.split(' ')[1]
         else:
-            return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+            return make_response('No auth token provided!', 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
         success, message = User.decode_auth_token(auth_token)
         if success:
@@ -171,7 +171,7 @@ def login_required(f):
             else:
                 return f(*args, user=user, **kwargs)
         else:
-            return make_response(message, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+            return make_response(message, 401, {'WWW-Authenticate' : 'Basic realm='Login Required''})
 
     return verify_login_wrapper
 

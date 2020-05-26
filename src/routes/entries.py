@@ -34,7 +34,7 @@ def create_entry(uid, user):
     if 'subentry_notes' not in request.form:
         return make_response('No subentry notes provided!', 400)
     if uid is None:
-        return make_response("No user ID Provided", 400)
+        return make_response('No user ID Provided', 400)
 
     # Create the pain subentry.
     # if 'body_'
@@ -52,7 +52,7 @@ def create_entry(uid, user):
     newentry.save()
     user.update(push__entries=newentry)
 
-    return make_response("Success", 201)
+    return make_response('Success', 201)
 
 ##########################################################################
 # Get entry details
@@ -63,7 +63,7 @@ def get_user(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
-        return make_response("This entry does not exist", 404)
+        return make_response('This entry does not exist', 404)
 
     return make_response(repr(entry), 200)
 
@@ -76,8 +76,8 @@ def delete_entry(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
-        return make_response("This entry does not exist", 404)
+        return make_response('This entry does not exist', 404)
 
     entry.delete()
 
-    return make_response("Entry successfully deleted", 200)
+    return make_response('Entry successfully deleted', 200)

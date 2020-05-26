@@ -19,7 +19,7 @@ def create_entry(uid, user):
     if 'type' not in request.form:
         return make_response('No type provided!', 400)
     if uid is None:
-        return make_response("No user ID Provided", 400)
+        return make_response('No user ID Provided', 400)
 
     # Create the body_part.
     new_part = BodyPart(
@@ -31,7 +31,7 @@ def create_entry(uid, user):
     new_part.save()
     user.update(push__body_parts=new_part)
 
-    return make_response("Success", 201)
+    return make_response('Success', 201)
 
 ##########################################################################
 # Get body parts
@@ -42,6 +42,6 @@ def get_user(uid, bpid, user):
     # Check entry id provided exists.
     body_part = BodyPart.objects(pk=bpid).first()
     if body_part is None:
-        return make_response("This body part does not exist", 404)
+        return make_response('This body part does not exist', 404)
 
     return make_response(repr(body_part), 200)

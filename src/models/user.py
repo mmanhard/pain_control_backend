@@ -75,7 +75,6 @@ class User(me.Document):
                 'iat': datetime.datetime.utcnow(),
                 'sub': str(self.id)
             }
-            print(payload['exp'])
             return jwt.encode(
                 payload,
                 current_app.config.get('SECRET_KEY'),

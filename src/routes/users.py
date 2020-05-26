@@ -66,7 +66,7 @@ def modify_user(uid, user):
             user['hash'] = generate_password_hash(value)
 
     user.save()
-    return make_response("User edited succesfully", 200)
+    return make_response('User edited succesfully', 200)
 
 ###########################################################################
 # Delete user
@@ -76,4 +76,4 @@ def modify_user(uid, user):
 def delete_user(uid, user):
     user.delete()
 
-    return make_response("User successfully deleted", 200)
+    return make_response('User successfully deleted', 200)
