@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 from mongoengine import *
 import json
 
-from ..models.user import User, getOptionalUserParams
+from ..models.user import User
 from .auth import login_required
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')

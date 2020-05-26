@@ -6,9 +6,6 @@ import jwt
 
 from . import BlacklistToken
 
-def getOptionalUserParams():
-    return ['phone', 'birthday', 'hometown', 'medical_history']
-
 class User(me.Document):
 
     email = me.StringField(required=True)
@@ -102,6 +99,10 @@ class User(me.Document):
             return False, 'Invalid token.'
         except Exception as e:
             return False, e
+
+    @staticmethod
+    def getOptionalUserParams():
+        return ['phone', 'birthday', 'hometown', 'medical_history']
 
 
 

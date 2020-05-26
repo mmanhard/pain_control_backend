@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import functools
 import jwt
 
-from ..models.user import User, getOptionalUserParams
+from ..models.user import User
 from ..models.blacklist_token import BlacklistToken
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -50,7 +50,7 @@ def register():
     )
 
     # Add optional parameters
-    optional_params = getOptionalUserParams()
+    optional_params = User.getOptionalUserParams()
     for param in optional_params:
         if param in request.json:
             newuser[param] = request.json[param]
