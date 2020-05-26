@@ -1,5 +1,4 @@
-from flask import Blueprint, request, redirect, session, jsonify, render_template, make_response
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, request, jsonify, make_response
 from mongoengine import *
 import json
 
