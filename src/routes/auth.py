@@ -176,11 +176,14 @@ def login_required(f):
 
         success, message = User.decode_auth_token(auth_token)
         if success:
+            if 'uid' not in kwargs or kwargs['uid'] != message:
+                return make_response('Access forbidden', 403, {'Content-Type': 'application/json'})
+
             user, err = verify_user(message)
             if user == None:
                 return make_response(err, 404, {'Content-Type': 'application/json'})
             else:
-                return f(*args, **kwargs)
+                return f(*args, user=user, **kwargs)
         else:
             return make_response(message, 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 

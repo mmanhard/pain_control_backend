@@ -4,7 +4,7 @@ from mongoengine import *
 import json
 
 from ..models.user import User, getOptionalUserParams
-# from .auth import login_required
+from .auth import login_required
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -47,8 +47,8 @@ def create_user():
 #
 ###########################################################################
 @users_bp.route('/<uid>/', methods=['GET'])
-# @login_required
-def get_user(uid):
+@login_required
+def get_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
         return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
@@ -63,8 +63,8 @@ def get_user(uid):
 # Update user info
 ###########################################################################
 @users_bp.route('/<uid>', methods=['PATCH'])
-# @login_required
-def modify_user(uid):
+@login_required
+def modify_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
         return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
@@ -96,8 +96,8 @@ def modify_user(uid):
 # # Delete user
 # ###########################################################################
 @users_bp.route('/<uid>', methods=['DELETE'])
-# @login_required
-def delete_user(uid):
+@login_required
+def delete_user(uid, user):
     user, err = verify_user(uid)
     if err is not None:
         return make_response(err['message'], err['status_code'], {'Content-Type': 'application/json'})
