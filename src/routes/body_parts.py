@@ -30,20 +30,20 @@ def get_body_parts(uid, user):
 @body_parts_bp.route('/', methods=['POST'])
 @login_required
 def create_entry(uid, user):
+    print('hello')
     # Check all required fields are provided.
-    if 'name' not in request.form:
+    if 'name' not in request.json:
         return make_response('No name provided!', 400)
-    if 'type' not in request.form:
+    if 'type' not in request.json:
         return make_response('No type provided!', 400)
     if uid is None:
         return make_response('No user ID Provided', 400)
 
     # Create the body_part.
     new_part = BodyPart(
-    name = request.form['name'],
-    type = request.form['type'],
-    user = user,
-    notes = request.form['notes']
+    name = request.json['name'],
+    type = request.json['type'],
+    user = user
     )
     new_part.save()
     user.update(push__body_parts=new_part)
