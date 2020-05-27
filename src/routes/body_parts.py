@@ -22,14 +22,18 @@ def get_body_parts(uid, user):
     s = []
     for bp in body_parts:
         s.append(bp.serialize())
-    return make_response(json.dumps(s, indent=4), 200)
+    responseObject = {
+        'body_parts': s,
+        'status': 'success',
+    }
+    return make_response(responseObject, 200)
 
 ##########################################################################
 # Create new body part
 ###########################################################################
 @body_parts_bp.route('/', methods=['POST'])
 @login_required
-def create_entry(uid, user):
+def create_body_part(uid, user):
     print('hello')
     # Check all required fields are provided.
     if 'name' not in request.json:

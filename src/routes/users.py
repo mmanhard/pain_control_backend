@@ -37,7 +37,11 @@ def get_user(uid, user):
     if 'detail_level' in request.args:
         detail_level = request.args['detail_level']
 
-    return make_response(user.serialize(detail_level=detail_level), 200)
+    responseObject = {
+        'user_info': user.serialize(detail_level=detail_level),
+        'status': 'success',
+    }
+    return make_response(responseObject, 200)
 
 ##########################################################################
 # Update user info
