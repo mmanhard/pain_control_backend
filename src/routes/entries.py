@@ -14,12 +14,16 @@ entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 ###########################################################################
 @entries_bp.route('/', methods=['GET'])
 @login_required
-def index(uid, user):
+def get_entries(uid, user):
     all_entries = Entry.objects()
-    s = []
-    for e in all_entries:
-        s.append(e.serialize())
-    return make_response(json.dumps(s, sort_keys=True, indent=4),200)
+
+    all_entries_serialized = []
+    for entry in all_entries:
+        all_entries_serialized.append(entry.serialize())
+    responseObject = {
+        'entries': all_entries_serialized
+    }
+    return make_response(responseObject, 200)
 
 ##########################################################################
 # Create new entry
@@ -30,11 +34,11 @@ def create_entry(uid, user):
 
     # Check all required fields are provided.
     if 'notes' not in request.form:
-        return make_response('No notes provided!', 400)
+        return make_response({'message': 'No notes provided!'}, 400)
     if 'subentry_notes' not in request.form:
-        return make_response('No subentry notes provided!', 400)
+        return make_response({'message': 'No subentry notes provided!'}, 400)
     if uid is None:
-        return make_response('No user ID Provided', 400)
+        return make_response({'message': 'No user ID Provided'}, 400)
 
     # Create the pain subentry.
     # if 'body_'
@@ -45,27 +49,34 @@ def create_entry(uid, user):
     # )
 
     # Create the entry and save a reference to it in the user db.
-    newentry = Entry(
+    new_entry = Entry(
     user = user,
     notes = request.form['notes']
     )
-    newentry.save()
-    user.update(push__entries=newentry)
+    new_entry.save()
+    user.update(push__entries=new_entry)
 
-    return make_response('Success', 201)
+    responseObject = {
+        'message': 'Entry successfully created.',
+        'entry_info': str(new_entry.id)
+    }
+    return make_response(responseObject, 201)
 
 ##########################################################################
 # Get entry details
 ###########################################################################
 @entries_bp.route('/<eid>/', methods=['GET'])
 @login_required
-def get_user(uid, eid, user):
+def get_entry(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
-        return make_response('This entry does not exist', 404)
+        return make_response({'message': 'This entry does not exist'}, 404)
 
-    return make_response(repr(entry), 200)
+    responseObject = {
+        'entry_info': repr(entry)
+    }
+    return make_response(responseObject, 200)
 
 ##########################################################################
 # Delete entry
@@ -76,8 +87,8 @@ def delete_entry(uid, eid, user):
     # Check entry id provided exists.
     entry = Entry.objects(pk=eid).first()
     if entry is None:
-        return make_response('This entry does not exist', 404)
+        return make_response({'message': 'This entry does not exist'}, 404)
 
     entry.delete()
 
-    return make_response('Entry successfully deleted', 200)
+    return make_response({'message': 'Entry successfully deleted'}, 200)

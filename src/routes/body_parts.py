@@ -17,14 +17,13 @@ def get_body_parts(uid, user):
     # Check entry id provided exists.
     body_parts = BodyPart.objects(user=user)
     if body_parts is None:
-        return make_response('User has no body parts available.', 404)
+        return make_response({'message': 'User has no body parts available.'}, 404)
 
-    s = []
+    body_parts_serialized = []
     for bp in body_parts:
-        s.append(bp.serialize())
+        body_parts_serialized.append(bp.serialize())
     responseObject = {
-        'body_parts': s,
-        'status': 'success',
+        'body_parts': body_parts_serialized
     }
     return make_response(responseObject, 200)
 
@@ -37,11 +36,11 @@ def create_body_part(uid, user):
     print('hello')
     # Check all required fields are provided.
     if 'name' not in request.json:
-        return make_response('No name provided!', 400)
+        return make_response({'message': 'No name provided!'}, 400)
     if 'type' not in request.json:
-        return make_response('No type provided!', 400)
+        return make_response({'message': 'No type provided!'}, 400)
     if uid is None:
-        return make_response('No user ID Provided', 400)
+        return make_response({'message': 'No user ID Provided'}, 400)
 
     # Create the body_part.
     new_part = BodyPart(
@@ -52,7 +51,11 @@ def create_body_part(uid, user):
     new_part.save()
     user.update(push__body_parts=new_part)
 
-    return make_response('Success', 201)
+    responseObject = {
+        'message': 'Body part created successfully.',
+        'body_part_info': str(new_part.id)
+    }
+    return make_response(responseObject, 201)
 
 ##########################################################################
 # Get body part
@@ -63,6 +66,7 @@ def get_body_part(uid, bpid, user):
     # Check entry id provided exists.
     body_part = BodyPart.objects(pk=bpid).first()
     if body_part is None:
-        return make_response('This body part does not exist', 404)
+        return make_response({'message': 'This body part does not exist'}, 404)
 
-    return make_response(repr(body_part), 200)
+    responseObject = repr(body_part)
+    return make_response(responseObject, 200)
