@@ -71,7 +71,7 @@ class User(me.Document):
     def encodeAuthToken(self):
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=200),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=604800),
                 'iat': datetime.datetime.utcnow(),
                 'sub': str(self.id)
             }
