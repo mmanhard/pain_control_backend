@@ -4,8 +4,9 @@ import json
 
 from .auth import login_required
 from ..models.user import User
-from ..models.subentry import SubEntry, MoodSubEntry
+from ..models.subentry import SubEntry, PainSubEntry
 from ..models.entry import Entry
+from ..models.body_part import BodyPart
 
 entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 
@@ -33,28 +34,37 @@ def get_entries(uid, user):
 def create_entry(uid, user):
 
     # Check all required fields are provided.
-    if 'notes' not in request.form:
-        return make_response({'message': 'No notes provided!'}, 400)
-    if 'subentry_notes' not in request.form:
-        return make_response({'message': 'No subentry notes provided!'}, 400)
     if uid is None:
         return make_response({'message': 'No user ID Provided'}, 400)
 
-    # Create the pain subentry.
-    # if 'body_'
-    # body_part
-    # # subentry = PainSubEntry(
-    # notes = request.form['subentry_notes'],
-    # mood = 'sad'
-    # )
-
     # Create the entry and save a reference to it in the user db.
     new_entry = Entry(
-    user = user,
-    notes = request.form['notes']
+    user = user
     )
     new_entry.save()
     user.update(push__entries=new_entry)
+
+    # Create the pain subentries and update the corresponding body parts.
+    pain_subentries = []
+    if 'pain_subentries' in request.json:
+        for pain_data in request.json['pain_subentries']:
+            pain_level = int(pain_data['pain_level'])
+            bp = BodyPart.objects(pk=pain_data['id']).first()
+            new_subentry = PainSubEntry(
+                body_part = bp,
+                pain_level = pain_level
+            )
+            pain_subentries.append(new_subentry)
+
+            bp.modifyBodyPartStats(pain_level)
+            bp.update(push__entries=new_entry)
+    new_entry.pain_subentries = pain_subentries
+
+    # Add optional notes.
+    if 'notes' in request.json:
+        new_entry.notes = request.json['notes']
+
+    new_entry.save()
 
     responseObject = {
         'message': 'Entry successfully created.',
