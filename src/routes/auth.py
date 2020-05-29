@@ -61,7 +61,9 @@ def register():
         auth_token = newuser.encodeAuthToken()
         responseObject = {
             'message': 'Successfully registered.',
-            'user_info': str(newuser.id),
+            'user_info': {
+                'id': str(newuser.id)
+            },
             'auth_token': auth_token.decode()
         }
         return make_response(responseObject, 201)
@@ -90,7 +92,9 @@ def login():
             auth_token = user.encodeAuthToken()
             responseObject = {
                 'message': 'Successfully logged in.',
-                'user_info': str(user.id),
+                'user_info': {
+                    'id': str(user.id)
+                },
                 'auth_token': auth_token.decode()
             }
             return make_response(responseObject, 200)
