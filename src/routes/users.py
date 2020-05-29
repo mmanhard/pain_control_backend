@@ -49,28 +49,28 @@ def get_user(uid, user):
 ##########################################################################
 # Update user info
 ###########################################################################
-@users_bp.route('/<uid>', methods=['PATCH'])
+@users_bp.route('/<uid>/', methods=['PATCH'])
 @login_required
 def modify_user(uid, user):
     # Check to see if request contains changes to unsupport fields.
     if 'email' in request.json:
         return make_response({'message': 'Changes to email not supported'}, 400)
-    if 'phone' in request.json:
-        return make_response({'message': 'Changes to phone number not supported'}, 400)
     if 'hash' in request.json:
         return make_response({'message': 'Changes to hash not supported'}, 400)
+    if 'password' in request.json:
+        return make_response({'message': 'Changes to password not currently supported'}, 400)
     if 'entries' in request.json:
         return make_response({'message': 'Changes to entries directly is not supported'}, 400)
     if 'body_parts' in request.json:
         return make_response({'message': 'Changes to body parts directly is not supported'}, 400)
 
     for (key, value) in request.json.items():
-        if key in user and user[key] != value:
-            user[key] = value
-        elif key == 'password':
-            if not valid_password(value):
-                return make_response({'message': 'Password is invalid!'}, 400)
-            user['hash'] = generate_password_hash(value)
+        try:
+            old_value = getattr(user, key)
+            if old_value != value:
+                setattr(user, key, value)
+        except AttributeError:
+            pass
 
     user.save()
     return make_response({'message': 'User edited succesfully'}, 200)
