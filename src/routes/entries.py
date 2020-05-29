@@ -84,7 +84,7 @@ def get_entry(uid, eid, user):
         return make_response({'message': 'This entry does not exist'}, 404)
 
     responseObject = {
-        'entry_info': repr(entry)
+        'entry_info': entry.serialize()
     }
     return make_response(responseObject, 200)
 

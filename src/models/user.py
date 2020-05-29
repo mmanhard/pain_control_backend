@@ -32,11 +32,11 @@ class User(me.Document):
             'id': str(self.id),
             'first_name': self.first_name,
             'last_name': self.last_name,
+            'email': self.email,
         }
 
         if detail_level == 'medium' or detail_level == 'high':
             serialized.update({
-                'email': self.email,
                 'phone': self.phone,
                 'date_joined': int((datetime.datetime.utcnow() - self.date_joined).total_seconds()),
             })

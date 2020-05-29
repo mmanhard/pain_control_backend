@@ -14,6 +14,15 @@ class PainSubEntry(SubEntry):
     life_impact = me.IntField()
     mood_impact = me.IntField()
 
+    def serialize(self):
+        return {
+            'body_part': str(self.body_part.id),
+            'pain_level': self.pain_level,
+            'life_impact': self.life_impact,
+            'mood_impact': self.mood_impact,
+            'notes': self.notes
+        }
+
 class MoodSubEntry(SubEntry):
     medication = me.StringField(required=True)
     med_impact = me.IntField(required=True)
