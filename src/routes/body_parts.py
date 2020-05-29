@@ -4,6 +4,7 @@ import json
 
 from .auth import login_required
 from ..models.user import User
+from ..models.body_part_stats import BodyPartStats
 from ..models.body_part import BodyPart
 
 body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_parts')
@@ -33,7 +34,6 @@ def get_body_parts(uid, user):
 @body_parts_bp.route('/', methods=['POST'])
 @login_required
 def create_body_part(uid, user):
-    print('hello')
     # Check all required fields are provided.
     if 'name' not in request.json:
         return make_response({'message': 'No name provided!'}, 400)
@@ -42,14 +42,25 @@ def create_body_part(uid, user):
     if uid is None:
         return make_response({'message': 'No user ID Provided'}, 400)
 
+    # Create the body_part stats.
+    new_stats = BodyPartStats()
+
     # Create the body_part.
     new_part = BodyPart(
     name = request.json['name'],
     type = request.json['type'],
-    user = user
+    user = user,
+    stats = new_stats
     )
     new_part.save()
     user.update(push__body_parts=new_part)
+
+    # Add optional fields.
+    if 'location' in request.json:
+        new_part.location = request.json['location']
+    if 'notes' in request.json:
+        new_part.notes = request.json['notes']
+    new_part.save()
 
     responseObject = {
         'message': 'Body part created successfully.',
@@ -68,5 +79,7 @@ def get_body_part(uid, bpid, user):
     if body_part is None:
         return make_response({'message': 'This body part does not exist'}, 404)
 
-    responseObject = repr(body_part)
+    responseObject = {
+        'body_part_info': body_part.serialize()
+    }
     return make_response(responseObject, 200)

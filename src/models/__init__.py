@@ -4,6 +4,7 @@ from .blacklist_token import BlacklistToken
 from .user import User
 from .subentry import SubEntry, MoodSubEntry, MedicationSubEntry, ActivitySubEntry, PainSubEntry
 from .entry import Entry
+from .body_part_stats import BodyPartStats
 from .body_part import BodyPart
 
 db = MongoEngine()
