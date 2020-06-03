@@ -16,7 +16,10 @@ class PainSubEntry(SubEntry):
 
     def serialize(self):
         return {
-            'body_part': str(self.body_part.id),
+            'body_part': {
+                'id': str(self.body_part.id),
+                'name': self.body_part.name
+            },
             'pain_level': self.pain_level,
             'life_impact': self.life_impact,
             'mood_impact': self.mood_impact,
