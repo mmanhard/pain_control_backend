@@ -1,14 +1,16 @@
 import json
 import datetime
 import mongoengine as me
+from .entry_stats import EntryStats
 
 class Entry(me.Document):
 
     user = me.ReferenceField('User', reverse_delete_rule=me.CASCADE, required=True)
-    date = me.DateTimeField(required=True, default=datetime.datetime.utcnow)
+    date = me.DateTimeField(required=True, default=datetime.datetime.now)
 
     notes = me.StringField(max_length=500)
 
+    stats =  me.EmbeddedDocumentField('EntryStats')
     pain_subentries = me.EmbeddedDocumentListField('PainSubEntry')
     mood_subentry = me.EmbeddedDocumentField('MoodSubEntry')
     medication_subentry = me.EmbeddedDocumentField('MedicationSubEntry')
@@ -18,13 +20,38 @@ class Entry(me.Document):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
     def serialize(self):
+        if self.stats is not None:
+            stats = self.stats
+        else:
+            stats = EntryStats()
+            self.stats = stats
+
         pain_serialized = []
         for subentry in self.pain_subentries:
             pain_serialized.append(subentry.serialize())
-
         return {
             'id': str(self.id),
             'user': str(self.user.id),
             'pain_subentries': pain_serialized,
-            'notes': self.notes
+            'notes': self.notes,
+            'date': self.date,
+            'stats': stats.serialize()
         }
+
+    def create_stats(self, high, low, total, num_pain_subentries):
+        if num_pain_subentries <= 0:
+            return
+
+        # Create the stats object if it doesn't exist.
+        if self.stats is not None:
+            stats = self.stats
+        else:
+            stats = EntryStats()
+
+        stats.high = high
+        stats.low = low
+        stats.avg = total / num_pain_subentries
+        stats.num_body_parts = num_pain_subentries
+
+        self.stats = stats
+        self.save()
