@@ -29,7 +29,7 @@ class EntryController():
         return serialized_entries
 
     @staticmethod
-    def getEntries(user, start_date=None, end_date=None, time_of_day=None, pain_point=None, sort_by=None):
+    def getEntries(user, start_date=None, end_date=None, time_of_day=None, body_part=None, sort_by=None):
 
         # Add query filters for date range, and specific body part.
         query = Q(user=user)
@@ -37,8 +37,8 @@ class EntryController():
             query = query & Q(date__gte=start_date)
         if end_date is not None:
             query = query & Q(date__lte=end_date)
-        if pain_point is not None:
-            query = query & Q(pain_subentries__match={ 'body_part': pain_point })
+        if body_part is not None:
+            query = query & Q(pain_subentries__match={ 'body_part': body_part })
 
         entries = Entry.objects(query)
 
@@ -57,22 +57,20 @@ class EntryController():
         return entries
 
     @staticmethod
-    def getEntriesByIDs(user, start_date=None, end_date=None, time_of_day=None):
+    def getPainEntries(user, body_part, start_date=None, end_date=None, time_of_day=None):
 
-        query = Q(user=user)
-        if start_date is not None:
-            query = query & Q(date__gte=start_date)
-        if end_date is not None:
-            query = query & Q(date__lte=end_date)
+        entries = EntryController.getEntries(user, start_date, end_date, time_of_day, body_part.id)
 
-        entries = Entry.objects(query).order_by('-date')
+        # Extract the date and pain level from subentries with the specified body part.
+        pain_entries = []
+        for entry in entries:
+            pain_entry = { 'date': entry.date }
+            for subentry in entry.pain_subentries:
+                if (subentry.body_part == body_part):
+                    pain_entry['pain_level'] = subentry.pain_level
+            pain_entries.append(pain_entry)
 
-        if time_of_day in day_times:
-            (start_time, end_time) = day_times[time_of_day]
-
-            entries = [entry for entry in entries if (start_time <= entry.date.hour <= end_time)]
-
-        return entries
+        return pain_entries
 
     @staticmethod
     def getEntryByID(user, eid):

@@ -17,7 +17,7 @@ class BodyPart(me.Document):
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
-    def serialize(self):
+    def serialize(self, customStats=None):
         if self.stats is not None:
             stats = self.stats
         else:
@@ -31,7 +31,8 @@ class BodyPart(me.Document):
             'location': self.location,
             'notes': self.notes,
             'entries': self.getEntryIDs(),
-            'stats': stats.serialize()
+            'stats': stats.serialize(),
+            'customStats': customStats
         }
 
     def getEntryIDs(self):
