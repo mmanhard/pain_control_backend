@@ -1,12 +1,15 @@
 from flask import Blueprint, request, make_response
 from mongoengine import *
 import json
+import datetime
 
 from .auth import login_required
 from ..models.user import User
 from ..models.subentry import SubEntry, PainSubEntry
 from ..models.entry import Entry
 from ..models.body_part import BodyPart
+
+from ..controllers.entry import EntryController
 
 entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 
@@ -16,14 +19,38 @@ entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 @entries_bp.route('/', methods=['GET'])
 @login_required
 def get_entries(uid, user):
-    all_entries = Entry.objects()
 
-    all_entries_serialized = []
-    for entry in all_entries:
-        all_entries_serialized.append(entry.serialize())
+    start_date = None
+    end_date = None
+    time_of_day = None
+    pain_point = None
+    sort_by = None
+
+    if 'start_date' in request.args:
+        start_date = request.args['start_date']
+        start_date = start_date[:len(start_date)-1]
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%f')
+
+    if 'end_date' in request.args:
+        end_date = request.args['end_date']
+        end_date = end_date[:len(end_date)-1]
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f')
+
+    if 'time_of_day' in request.args:
+        time_of_day = request.args['time_of_day']
+
+    if 'pain_point' in request.args:
+        pain_point = request.args['pain_point']
+
+    if 'sort_by' in request.args:
+        sort_by = request.args['sort_by']
+
+    entries = EntryController.getEntries(user, start_date, end_date, time_of_day, pain_point, sort_by)
+
     responseObject = {
-        'entries': all_entries_serialized
+        'entries': EntryController.serializeEntries(entries)
     }
+
     return make_response(responseObject, 200)
 
 ##########################################################################
@@ -46,6 +73,9 @@ def create_entry(uid, user):
 
     # Create the pain subentries and update the corresponding body parts.
     pain_subentries = []
+    pain_total = 0
+    pain_min = 10
+    pain_max = 0
     if 'pain_subentries' in request.json:
         for pain_data in request.json['pain_subentries']:
             pain_level = int(pain_data['pain_level'])
@@ -54,11 +84,20 @@ def create_entry(uid, user):
                 body_part = bp,
                 pain_level = pain_level
             )
+
+            pain_total += pain_level
+            if pain_level < pain_min:
+                pain_min = pain_level
+            if pain_level > pain_max:
+                pain_max = pain_level
+
             pain_subentries.append(new_subentry)
 
             bp.modifyBodyPartStats(pain_level)
             bp.update(push__entries=new_entry)
+
     new_entry.pain_subentries = pain_subentries
+    new_entry.create_stats(pain_max, pain_min, pain_total, len(pain_subentries))
 
     # Add optional notes.
     if 'notes' in request.json:
@@ -79,7 +118,7 @@ def create_entry(uid, user):
 @login_required
 def get_entry(uid, eid, user):
     # Check entry id provided exists.
-    entry = Entry.objects(pk=eid).first()
+    entry = EntryController.getEntryByID(user, eid)
     if entry is None:
         return make_response({'message': 'This entry does not exist'}, 404)
 
