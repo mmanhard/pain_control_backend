@@ -8,7 +8,7 @@ import queue
 class BodyPartController():
 
     @staticmethod
-    def getBodyPartByID(user, bpid, start_date=None, end_date=None, time_of_day=None, movingWindowSize=1):
+    def getBodyPartByID(user, bpid, start_date=None, end_date=None, time_of_day=None, movingWindowSize=10):
 
         body_part = BodyPart.objects(pk=bpid).first()
 
