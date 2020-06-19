@@ -18,16 +18,14 @@ body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_
 @body_parts_bp.route('/', methods=['GET'])
 @login_required
 def get_body_parts(uid, user):
-    # Check entry id provided exists.
-    body_parts = BodyPart.objects(user=user)
-    if body_parts is None:
-        return make_response({'message': 'User has no body parts available.'}, 404)
 
-    body_parts_serialized = []
-    for bp in body_parts:
-        body_parts_serialized.append(bp.serialize())
+    body_parts = []
+    for body_part in user.body_parts:
+        (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, body_part.id)
+        body_parts.append(body_part.serialize(pain_stats))
+
     responseObject = {
-        'body_parts': body_parts_serialized
+        'body_parts': body_parts,
     }
     return make_response(responseObject, 200)
 
@@ -91,11 +89,11 @@ def get_body_part(uid, bpid, user):
         time_of_day = request.args['time_of_day']
 
     # Check entry id provided exists.
-    (body_part, pain_levels) = BodyPartController.getBodyPartByID(user, bpid, start_date, end_date, time_of_day)
+    (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, bpid, start_date, end_date, time_of_day)
     if body_part is None:
         return make_response({'message': 'This body part does not exist'}, 404)
 
     responseObject = {
-        'body_part_info': body_part.serialize(pain_levels)
+        'body_part_info': body_part.serialize(pain_stats)
     }
     return make_response(responseObject, 200)
