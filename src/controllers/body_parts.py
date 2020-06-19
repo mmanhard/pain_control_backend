@@ -82,7 +82,8 @@ class BodyPartController():
             'low': min(pain_levels),
             'mean': mean(pain_levels),
             'median': median(pain_levels),
-            'stdev': dev
+            'stdev': dev,
+            'num_entries': len(pain_levels)
         }
 
 
