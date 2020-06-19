@@ -93,7 +93,6 @@ def create_entry(uid, user):
 
             pain_subentries.append(new_subentry)
 
-            bp.modifyBodyPartStats(pain_level)
             bp.update(push__entries=new_entry)
 
     new_entry.pain_subentries = pain_subentries

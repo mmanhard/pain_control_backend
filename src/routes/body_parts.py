@@ -45,15 +45,11 @@ def create_body_part(uid, user):
     if uid is None:
         return make_response({'message': 'No user ID Provided'}, 400)
 
-    # Create the body_part stats.
-    new_stats = BodyPartStats()
-
     # Create the body_part.
     new_part = BodyPart(
     name = request.json['name'],
     type = request.json['type'],
     user = user,
-    stats = new_stats
     )
     new_part.save()
     user.update(push__body_parts=new_part)

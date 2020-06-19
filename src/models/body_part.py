@@ -18,11 +18,6 @@ class BodyPart(me.Document):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
     def serialize(self, customStats=None):
-        if self.stats is not None:
-            stats = self.stats
-        else:
-            stats = BodyPartStats()
-            self.stats = stats
         return {
             'id': str(self.id),
             'name': self.name,
@@ -31,8 +26,7 @@ class BodyPart(me.Document):
             'location': self.location,
             'notes': self.notes,
             'entries': self.getEntryIDs(),
-            'stats': stats.serialize(),
-            'customStats': customStats
+            'stats': customStats
         }
 
     def getEntryIDs(self):
@@ -42,24 +36,3 @@ class BodyPart(me.Document):
             entryIDs.append(str(entry_ref.id))
 
         return entryIDs
-
-    # Modify stats based on a new entry
-    def modifyBodyPartStats(self, pain_level):
-        # Create the stats object if it doesn't exist.
-        if self.stats is not None:
-            stats = self.stats
-        else:
-            stats = BodyPartStats()
-
-        if pain_level > stats.high:
-            stats.high = pain_level
-
-        if pain_level < stats.low:
-            stats.low = pain_level
-
-        stats.avg = (stats.avg * stats.num_entries + pain_level) / (stats.num_entries + 1)
-
-        stats.num_entries = stats.num_entries + 1
-
-        self.stats = stats
-        self.save()
