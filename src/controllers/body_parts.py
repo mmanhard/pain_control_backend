@@ -14,59 +14,62 @@ class BodyPartController():
 
         pain_entries = EntryController.getPainEntries(user, body_part, start_date, end_date, time_of_day)
 
-        # Compute stats for each day (entries are already sorted by date).
-        current_day_levels = []
-        current_day = pain_entries[0]['date'].date()
-        calendar_stats = []
-        for entry in pain_entries:
-            entry_day = entry['date'].date()
-            if entry_day != current_day:
-                daily_stats = {
-                    'date': current_day,
-                    'stats': BodyPartController.computeStats(current_day_levels)
-                }
-                calendar_stats.append(daily_stats)
-                current_day = entry_day
-                current_day_levels = []
-            current_day_levels.append(entry['pain_level'])
-        daily_stats = {
-            'date': current_day,
-            'stats': BodyPartController.computeStats(current_day_levels)
-        }
-        calendar_stats.append(daily_stats)
+        if len(pain_entries) > 0:
+            # Compute stats for each day (entries are already sorted by date).
+            current_day_levels = []
+            current_day = pain_entries[0]['date'].date()
+            calendar_stats = []
+            for entry in pain_entries:
+                entry_day = entry['date'].date()
+                if entry_day != current_day:
+                    daily_stats = {
+                        'date': current_day,
+                        'stats': BodyPartController.computeStats(current_day_levels)
+                    }
+                    calendar_stats.append(daily_stats)
+                    current_day = entry_day
+                    current_day_levels = []
+                current_day_levels.append(entry['pain_level'])
+            daily_stats = {
+                'date': current_day,
+                'stats': BodyPartController.computeStats(current_day_levels)
+            }
+            calendar_stats.append(daily_stats)
 
-        # Compute moving stats (e.g. moving average) using a 10 entry window by default.
-        pain_level_queue = queue.Queue()
-        moving_stats = []
-        for (i, entry) in enumerate(pain_entries):
-            if pain_level_queue.qsize() >= movingWindowSize:
-                entry_moving_stats = {
-                    'date': pain_entries[i - movingWindowSize // 2]['date'],
-                    'stats': BodyPartController.computeStats(list(pain_level_queue.queue))
-                }
-                moving_stats.append(entry_moving_stats)
-                pain_level_queue.get()
+            # Compute moving stats (e.g. moving average) using a 10 entry window by default.
+            pain_level_queue = queue.Queue()
+            moving_stats = []
+            for (i, entry) in enumerate(pain_entries):
+                if pain_level_queue.qsize() >= movingWindowSize:
+                    entry_moving_stats = {
+                        'date': pain_entries[i - movingWindowSize // 2]['date'],
+                        'stats': BodyPartController.computeStats(list(pain_level_queue.queue))
+                    }
+                    moving_stats.append(entry_moving_stats)
+                    pain_level_queue.get()
 
-            pain_level_queue.put(entry['pain_level'])
+                pain_level_queue.put(entry['pain_level'])
 
-        # Compute stats for each time of day.
-        daytime_stats =  {key:{} for key in day_times.keys()}
-        for time_of_day in day_times:
-            (start_time, end_time) = day_times[time_of_day]
+            # Compute stats for each time of day.
+            daytime_stats =  {key:{} for key in day_times.keys()}
+            for time_of_day in day_times:
+                (start_time, end_time) = day_times[time_of_day]
 
-            daytime_levels = [pain_entry['pain_level'] for pain_entry in pain_entries if (start_time <= pain_entry['date'].hour <= end_time)]
-            daytime_stats[time_of_day] = BodyPartController.computeStats(daytime_levels)
+                daytime_levels = [pain_entry['pain_level'] for pain_entry in pain_entries if (start_time <= pain_entry['date'].hour <= end_time)]
+                daytime_stats[time_of_day] = BodyPartController.computeStats(daytime_levels)
 
-        # Compute stats for all entries.
-        pain_levels = [pain_entry['pain_level'] for pain_entry in pain_entries]
-        total_stats = BodyPartController.computeStats(pain_levels)
+            # Compute stats for all entries.
+            pain_levels = [pain_entry['pain_level'] for pain_entry in pain_entries]
+            total_stats = BodyPartController.computeStats(pain_levels)
 
-        pain_stats = {
-            'total': total_stats,
-            'calendar': calendar_stats,
-            'moving': moving_stats,
-            'daytime': daytime_stats
-        }
+            pain_stats = {
+                'total': total_stats,
+                'calendar': calendar_stats,
+                'moving': moving_stats,
+                'daytime': daytime_stats
+            }
+        else:
+            pain_stats = None
 
         return (body_part, pain_stats)
 

@@ -19,9 +19,20 @@ body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_
 @login_required
 def get_body_parts(uid, user):
 
+    start_date = None
+    end_date = None
+
+    if 'start_date' in request.args:
+        start_date = request.args['start_date']
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+    if 'end_date' in request.args:
+        end_date = request.args['end_date']
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+
     body_parts = []
     for body_part in user.body_parts:
-        (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, body_part.id)
+        (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, body_part.id, start_date, end_date)
         body_parts.append(body_part.serialize(pain_stats))
 
     responseObject = {
