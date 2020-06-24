@@ -24,7 +24,9 @@ class Entry(me.Document):
             stats = self.stats
         else:
             stats = EntryStats()
+            stats.update(self.pain_subentries)
             self.stats = stats
+            self.save()
 
         pain_serialized = []
         for subentry in self.pain_subentries:

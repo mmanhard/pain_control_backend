@@ -17,3 +17,21 @@ class EntryStats(me.EmbeddedDocument):
             'avg': str(self.avg),
             'num_body_parts': str(self.num_body_parts)
         }
+
+    def update(self, subentries):
+        pain_total = 0
+        pain_min = 10
+        pain_max = 0
+        for subentry in subentries:
+            pain_level = subentry.pain_level
+
+            pain_total += pain_level
+            if pain_level < pain_min:
+                pain_min = pain_level
+            if pain_level > pain_max:
+                pain_max = pain_level
+
+        self.high = pain_max
+        self.low = pain_min
+        self.avg = pain_total / len(subentries)
+        self.num_body_parts = len(subentries)
