@@ -18,7 +18,8 @@ class PainSubEntry(SubEntry):
         return {
             'body_part': {
                 'id': str(self.body_part.id),
-                'name': self.body_part.name
+                'name': self.body_part.name,
+                'location': self.body_part.location,
             },
             'pain_level': self.pain_level,
             'life_impact': self.life_impact,
