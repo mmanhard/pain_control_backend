@@ -14,7 +14,7 @@ day_times = {
 sortMap = {
     'date': '-date',
     'max_pain': '-stats.high',
-    'min_pain': '-stats.low',
+    'min_pain': '+stats.low',
     'avg_pain': '-stats.avg'
 }
 
