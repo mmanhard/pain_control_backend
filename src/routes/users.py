@@ -1,5 +1,5 @@
 from flask import current_app, Blueprint, request, make_response
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from mongoengine import *
 import json
 
@@ -74,6 +74,44 @@ def modify_user(uid, user):
 
     user.save()
     return make_response({'message': 'User edited succesfully'}, 200)
+
+##########################################################################
+# Update user password
+###########################################################################
+@users_bp.route('/<uid>/change_password/', methods=['PATCH'])
+@login_required
+def change_user_password(uid, user):
+    # Verify all required fields are provided.
+    if 'old_password' not in request.json:
+        return make_response({'message': 'No old password provided!'}, 400)
+    if 'new_password' not in request.json:
+        return make_response({'message': 'No new password provided!'}, 400)
+
+    # Verify the old password first then edit it.
+    old_password = request.json['old_password']
+    if check_password_hash(user.hash, old_password):
+        # Verify new password is valid and hash it.
+        new_password = request.json['new_password']
+        if not valid_password(new_password):
+            return make_response({'message': 'New password is invalid!'}, 400)
+        hash = generate_password_hash(new_password)
+
+        # Save the new password hash.
+        user.hash = hash
+        user.save()
+
+        # Generate auth token and send response.
+        try:
+            auth_token = user.encodeAuthToken()
+            responseObject = {
+                'message': 'Successfully changed password.',
+                'auth_token': auth_token.decode()
+            }
+            return make_response(responseObject, 200)
+        except Exception as e:
+            return make_response({'message': 'Could not create token.'}, 401)
+    else:
+        return make_response({'message': 'Could not verify old password!'}, 401)
 
 ###########################################################################
 # Delete user
