@@ -82,10 +82,6 @@ def create_body_part(uid, user):
 @body_parts_bp.route('/<bpid>/', methods=['GET'])
 @login_required
 def get_body_part(uid, bpid, user):
-    start_date = None
-    end_date = None
-    time_of_day = None
-
     if 'start_date' in request.args:
         start_date = request.args['start_date']
         start_date = start_date[:len(start_date)-1]
@@ -99,7 +95,7 @@ def get_body_part(uid, bpid, user):
     if 'time_of_day' in request.args:
         time_of_day = request.args['time_of_day']
 
-    # Check entry id provided exists.
+    # Check body part id provided exists.
     (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, bpid, start_date, end_date, time_of_day)
     if body_part is None:
         return make_response({'message': 'This body part does not exist'}, 404)
@@ -108,3 +104,29 @@ def get_body_part(uid, bpid, user):
         'body_part_info': body_part.serialize(pain_stats)
     }
     return make_response(responseObject, 200)
+
+
+
+##########################################################################
+# Edit body part
+###########################################################################
+@body_parts_bp.route('/<bpid>/', methods=['PATCH'])
+@login_required
+def edit_body_part(uid, bpid, user):
+    print('here')
+    # Check body part id provided exists.
+    body_part = BodyPart.objects(pk=bpid).first()
+    if body_part is None:
+        return make_response({'message': 'This body part does not exist'}, 404)
+
+    if 'name' in request.json:
+        body_part.name = request.json['name']
+    if 'location' in request.json:
+        body_part.location = request.json['location']
+    if 'type' in request.json:
+        body_part.type = request.json['type']
+
+    body_part.save()
+    return make_response({'message': 'Body part edited succesfully'}, 200)
+
+

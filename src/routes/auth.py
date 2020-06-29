@@ -84,7 +84,7 @@ def login():
     if user == None:
         return make_response({'message': 'User does not exist.'}, 404)
 
-    # Verify the p
+    # Verify the password then create a token
     password = request.json['password']
     if check_password_hash(user.hash, password):
         # Generate auth token
