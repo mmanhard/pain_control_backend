@@ -117,12 +117,12 @@ def create_entry(uid, user):
 @login_required
 def get_entry(uid, eid, user):
     # Check entry id provided exists.
-    entry = EntryController.getEntryByID(user, eid)
+    (entry, comparisons) = EntryController.getEntryByID(user, eid)
     if entry is None:
         return make_response({'message': 'This entry does not exist'}, 404)
 
     responseObject = {
-        'entry_info': entry.serialize()
+        'entry_info': entry.serialize(comparisons)
     }
     return make_response(responseObject, 200)
 

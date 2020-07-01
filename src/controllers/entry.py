@@ -1,6 +1,8 @@
 from ..models.entry import Entry
 import datetime
 from mongoengine.queryset.visitor import Q
+from collections import defaultdict
+from statistics import mean
 
 day_times = {
     'wakeup': (5,8),
@@ -74,4 +76,53 @@ class EntryController():
 
     @staticmethod
     def getEntryByID(user, eid):
-        return Entry.objects(Q(user=user) & Q(pk=eid)).first()
+        # Get the corresponding entry.
+        entry = Entry.objects(Q(user=user) & Q(pk=eid)).first()
+
+        # Get the most recent entry (if it exists) and compare it to the current one.
+        most_recent_entry = Entry.objects(Q(date__lt=entry.date)).order_by('-date').first()
+        print(most_recent_entry.date)
+        most_recent_comp = EntryController.compareEntries(entry, [most_recent_entry])
+
+        # Get all entries from yesterday (if they exist) and compare them to the current one.
+        yesterday_end = datetime.datetime(entry.date.year, entry.date.month, entry.date.day)
+        yesterday_begin = yesterday_end - datetime.timedelta(days=1)
+        yesterday_entries = Entry.objects(Q(date__gt=yesterday_begin) & Q(date__lt=yesterday_end))
+        yesterday_comp = EntryController.compareEntries(entry, yesterday_entries)
+
+
+        # Get all entries from last week (if they exist) and compare them to the current one.
+        last_week_end = yesterday_end - datetime.timedelta(days=6)
+        last_week_begin = yesterday_begin - datetime.timedelta(days=6)
+        last_week_entries = Entry.objects(Q(date__gt=last_week_begin) & Q(date__lt=last_week_end))
+        last_week_comp = EntryController.compareEntries(entry, last_week_entries)
+
+        comparisons = {
+            'most_recent': most_recent_comp,
+            'yesterday': yesterday_comp,
+            'last_week': last_week_comp
+        }
+
+        return (entry, comparisons)
+
+    @staticmethod
+    def compareEntries(base_entry, other_entries):
+
+        pain_levels = {}
+        for pain_entry in base_entry.pain_subentries:
+            pain_levels[pain_entry.body_part.id] = pain_entry.pain_level
+
+        # Find
+        other_pain_levels = defaultdict(list)
+        for entry in other_entries:
+            for pain_entry in entry.pain_subentries:
+                if pain_entry.body_part.id in pain_levels:
+                    other_pain_levels[pain_entry.body_part.id].append(pain_entry.pain_level)
+
+        comparisons = {}
+        for (id, other_pain_level) in other_pain_levels.items():
+            avg_other = mean(other_pain_level)
+            comparisons[str(id)] = pain_levels[id] - avg_other
+
+        return comparisons
+

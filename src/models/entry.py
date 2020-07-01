@@ -19,7 +19,7 @@ class Entry(me.Document):
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
-    def serialize(self):
+    def serialize(self, comparisons=None):
         if self.stats is not None:
             stats = self.stats
         else:
@@ -37,7 +37,8 @@ class Entry(me.Document):
             'pain_subentries': pain_serialized,
             'notes': self.notes,
             'date': self.date,
-            'stats': stats.serialize()
+            'stats': stats.serialize(),
+            'comparisons': comparisons
         }
 
     def create_stats(self, high, low, total, num_pain_subentries):
