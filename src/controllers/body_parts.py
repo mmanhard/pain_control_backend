@@ -88,6 +88,3 @@ class BodyPartController():
             'stdev': dev,
             'num_entries': len(pain_levels)
         }
-
-
-    # def calculateAverage(body_part, startDate, endDate):

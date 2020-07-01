@@ -82,6 +82,10 @@ def create_body_part(uid, user):
 @body_parts_bp.route('/<bpid>/', methods=['GET'])
 @login_required
 def get_body_part(uid, bpid, user):
+    start_date = None
+    end_date = None
+    time_of_day = None
+    
     if 'start_date' in request.args:
         start_date = request.args['start_date']
         start_date = start_date[:len(start_date)-1]
