@@ -58,22 +58,26 @@ class BodyPartController():
             high_queue = queue.Queue()
             low_queue = queue.Queue()
             mean_queue = queue.Queue()
+            std_dev_queue = queue.Queue()
             moving_stats = []
             for (i, daily_stat) in enumerate(calendar_stats):
                 high_queue.put(daily_stat['stats']['high'])
                 low_queue.put(daily_stat['stats']['low'])
                 mean_queue.put(daily_stat['stats']['mean'])
+                std_dev_queue.put(daily_stat['stats']['stdev'])
 
                 if high_queue.qsize() > movingWindowSize:
                     high_queue.get()
                     low_queue.get()
                     mean_queue.get()
+                    std_dev_queue.get()
 
                 if high_queue.qsize() == movingWindowSize:
                     stats = {
-                        'high': max(list(high_queue.queue)),
-                        'low': min(list(low_queue.queue)),
+                        'high': mean(list(high_queue.queue)),
+                        'low': mean(list(low_queue.queue)),
                         'mean': mean(list(mean_queue.queue)),
+                        'stdev': mean(list(std_dev_queue.queue)),
                     }
                     daily_moving_stats = {
                         'date': calendar_stats[i - movingWindowSize // 2]['date'],
