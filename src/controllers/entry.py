@@ -23,10 +23,10 @@ sortMap = {
 class EntryController():
 
     @staticmethod
-    def serializeEntries(entries):
+    def serializeEntries(entries, detail_level='high'):
         serialized_entries = []
         for entry in entries:
-            serialized_entries.append(entry.serialize())
+            serialized_entries.append(entry.serialize(detail_level=detail_level))
 
         return serialized_entries
 
@@ -81,7 +81,6 @@ class EntryController():
 
         # Get the most recent entry (if it exists) and compare it to the current one.
         most_recent_entry = Entry.objects(Q(date__lt=entry.date)).order_by('-date').first()
-        print(most_recent_entry.date)
         most_recent_comp = EntryController.compareEntries(entry, [most_recent_entry])
 
         # Get all entries from yesterday (if they exist) and compare them to the current one.

@@ -19,27 +19,34 @@ class Entry(me.Document):
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
-    def serialize(self, comparisons=None):
-        if self.stats is not None:
-            stats = self.stats
-        else:
-            stats = EntryStats()
-            stats.update(self.pain_subentries)
-            self.stats = stats
-            self.save()
-
-        pain_serialized = []
-        for subentry in self.pain_subentries:
-            pain_serialized.append(subentry.serialize())
-        return {
+    def serialize(self, comparisons=None, detail_level='high'):
+        serialized = {
             'id': str(self.id),
-            'user': str(self.user.id),
-            'pain_subentries': pain_serialized,
-            'notes': self.notes,
             'date': self.date,
-            'stats': stats.serialize(),
-            'comparisons': comparisons
         }
+
+        if detail_level == 'high':
+            if self.stats is not None:
+                stats = self.stats
+            else:
+                stats = EntryStats()
+                stats.update(self.pain_subentries)
+                self.stats = stats
+                self.save()
+
+
+            pain_serialized = []
+            for subentry in self.pain_subentries:
+                pain_serialized.append(subentry.serialize())
+
+            serialized.update({
+                'pain_subentries': pain_serialized,
+                'notes': self.notes,
+                'stats': stats.serialize(),
+                'comparisons': comparisons
+            })
+
+        return serialized
 
     def create_stats(self, high, low, total, num_pain_subentries):
         if num_pain_subentries <= 0:

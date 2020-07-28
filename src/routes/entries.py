@@ -27,6 +27,7 @@ def get_entries(uid, user):
     time_of_day = None
     pain_point = None
     sort_by = None
+    detail_level = 'low'
 
     if 'start_date' in request.args:
         start_date = request.args['start_date']
@@ -45,10 +46,13 @@ def get_entries(uid, user):
     if 'sort_by' in request.args:
         sort_by = request.args['sort_by']
 
+    if 'detail_level' in request.args:
+        detail_level = request.args['detail_level']
+
     entries = EntryController.getEntries(user, start_date, end_date, time_of_day, pain_point, sort_by)
 
     responseObject = {
-        'entries': EntryController.serializeEntries(entries)
+        'entries': EntryController.serializeEntries(entries, detail_level)
     }
 
     return make_response(responseObject, 200)
