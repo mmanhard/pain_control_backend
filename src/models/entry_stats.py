@@ -33,5 +33,9 @@ class EntryStats(me.EmbeddedDocument):
 
         self.high = pain_max
         self.low = pain_min
-        self.avg = pain_total / len(subentries)
+
+        if subentries:
+            self.avg = pain_total / len(subentries)
+        else:
+            self.avg = 0
         self.num_body_parts = len(subentries)
