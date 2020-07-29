@@ -64,7 +64,7 @@ class EntryController():
         # Extract the date and pain level from subentries with the specified body part.
         pain_entries = []
         for entry in entries:
-            pain_entry = { 'date': entry.date }
+            pain_entry = { 'date': entry.date, 'daytime': entry.daytime }
             for subentry in entry.pain_subentries:
                 if (subentry.body_part == body_part):
                     pain_entry['pain_level'] = subentry.pain_level
@@ -82,6 +82,7 @@ class EntryController():
             for subentry in entry.pain_subentries:
                 pain_entry = {
                     'date': entry.date,
+                    'daytime': entry.daytime,
                     'pain_level': subentry.pain_level
                 }
                 painEntryDict[subentry.body_part.id].append(pain_entry)

@@ -70,9 +70,7 @@ class BodyPartController():
     def computeDaytimeStats(pain_entries):
         daytime_stats =  {key:{} for key in day_times.keys()}
         for time_of_day in day_times:
-            (start_time, end_time) = day_times[time_of_day]
-
-            daytime_levels = [pain_entry['pain_level'] for pain_entry in pain_entries if (start_time <= pain_entry['date'].hour <= end_time)]
+            daytime_levels = [pain_entry['pain_level'] for pain_entry in pain_entries if (pain_entry['daytime'] == time_of_day)]
             daytime_stats[time_of_day] = BodyPartController.computeStats(daytime_levels)
 
         return daytime_stats
