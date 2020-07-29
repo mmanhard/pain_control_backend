@@ -17,17 +17,23 @@ class BodyPart(me.Document):
     def __repr__(self):
         return json.dumps(self.serialize(), sort_keys=True, indent=4)
 
-    def serialize(self, customStats=None):
-        return {
+    def serialize(self, customStats=None, detail_level='high'):
+        serialized = {
             'id': str(self.id),
             'name': self.name,
             'type': self.type,
-            'user': str(self.user.id),
             'location': self.location,
-            'notes': self.notes,
-            'entries': self.getEntryIDs(),
-            'stats': customStats
         }
+
+        if customStats: serialized['stats'] = customStats
+
+        if detail_level == 'high':
+            serialized.update({
+                'notes': self.notes,
+                'entries': self.getEntryIDs(),
+            })
+
+        return serialized
 
     def getEntryIDs(self):
         all_entries = self.entries

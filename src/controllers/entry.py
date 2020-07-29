@@ -3,6 +3,7 @@ import datetime
 from mongoengine.queryset.visitor import Q
 from collections import defaultdict
 from statistics import mean
+import datetime
 
 day_times = {
     'wakeup': (5,8),
@@ -73,6 +74,22 @@ class EntryController():
             pain_entries.append(pain_entry)
 
         return pain_entries
+
+    @staticmethod
+    def getPainEntryDict(user, start_date=None, end_date=None, time_of_day=None):
+
+        entries = EntryController.getEntries(user, start_date, end_date, time_of_day)
+
+        painEntryDict = defaultdict(list)
+        for entry in entries:
+            for subentry in entry.pain_subentries:
+                pain_entry = {
+                    'date': entry.date,
+                    'pain_level': subentry.pain_level
+                }
+                painEntryDict[subentry.body_part.id].append(pain_entry)
+                
+        return painEntryDict
 
     @staticmethod
     def getEntryByID(user, eid):

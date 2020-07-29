@@ -9,6 +9,7 @@ from ..models.body_part_stats import BodyPartStats
 from ..models.body_part import BodyPart
 
 from ..controllers.body_parts import BodyPartController
+from ..controllers.entry import EntryController
 
 body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_parts')
 
@@ -30,14 +31,17 @@ def get_body_parts(uid, user):
         end_date = request.args['end_date']
         end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f%z")
 
+    painEntryDict = EntryController.getPainEntryDict(user, start_date, end_date)
+
     body_parts = []
     for body_part in user.body_parts:
-        (body_part, pain_stats) = BodyPartController.getBodyPartByID(user, body_part.id, start_date, end_date)
-        body_parts.append(body_part.serialize(pain_stats))
+        pain_stats = BodyPartController.computeBodyPartStats(body_part, painEntryDict[body_part.id], start_date, end_date, detail_level='low')
+        body_parts.append(body_part.serialize(pain_stats, detail_level='low'))
 
     responseObject = {
         'body_parts': body_parts,
     }
+
     return make_response(responseObject, 200)
 
 ##########################################################################
@@ -85,7 +89,7 @@ def get_body_part(uid, bpid, user):
     start_date = None
     end_date = None
     time_of_day = None
-    
+
     if 'start_date' in request.args:
         start_date = request.args['start_date']
         start_date = start_date[:len(start_date)-1]

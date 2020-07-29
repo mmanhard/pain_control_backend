@@ -24,26 +24,38 @@ histogram_map = {
 class BodyPartController():
 
     @staticmethod
-    def getBodyPartByID(user, bpid, start_date=None, end_date=None, time_of_day=None, movingWindowSize=3):
+    def getBodyPartByID(user, bpid, start_date=None, end_date=None, time_of_day=None, detail_level='high'):
 
         body_part = BodyPart.objects(pk=bpid).first()
 
-        pain_entries = EntryController.getPainEntries(user, body_part, start_date, end_date, time_of_day)
+        pain_stats = BodyPartController.computeBodyPartStats(body_part, start_date, end_date, time_of_day, detail_level)
+
+        return (body_part, pain_stats)
+
+    @staticmethod
+    def computeBodyPartStats(body_part, pain_entries=None, start_date=None, end_date=None, time_of_day=None, movingWindowSize=3, detail_level='high'):
+
+        if not pain_entries:
+            pain_entries = EntryController.getPainEntries(user, body_part, start_date, end_date, time_of_day)
 
         if len(pain_entries) > 0:
-            calendar_stats = BodyPartController.computeCalendarStats(pain_entries)
-
             pain_stats = {
                 'total': BodyPartController.computeTotalStats(pain_entries),
                 'daytime': BodyPartController.computeDaytimeStats(pain_entries),
-                'calendar': calendar_stats,
-                'moving': BodyPartController.computeMovingStats(calendar_stats, movingWindowSize),
-                'histogram': BodyPartController.computeHistogram(calendar_stats)
             }
+
+            if detail_level == 'high':
+                calendar_stats = BodyPartController.computeCalendarStats(pain_entries)
+
+                pain_stats.update({
+                    'calendar': calendar_stats,
+                    'moving': BodyPartController.computeMovingStats(calendar_stats, movingWindowSize),
+                    'histogram': BodyPartController.computeHistogram(calendar_stats)
+                })
         else:
             pain_stats = None
 
-        return (body_part, pain_stats)
+        return pain_stats
 
     # Compute stats for all entries.
     @staticmethod
