@@ -92,13 +92,11 @@ def get_body_part(uid, bpid, user):
 
     if 'start_date' in request.args:
         start_date = request.args['start_date']
-        start_date = start_date[:len(start_date)-1]
-        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%f')
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%f%z')
 
     if 'end_date' in request.args:
         end_date = request.args['end_date']
-        end_date = end_date[:len(end_date)-1]
-        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f%z')
 
     if 'time_of_day' in request.args:
         time_of_day = request.args['time_of_day']
