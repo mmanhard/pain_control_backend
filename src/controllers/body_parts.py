@@ -28,15 +28,14 @@ class BodyPartController():
 
         body_part = BodyPart.objects(pk=bpid).first()
 
-        pain_stats = BodyPartController.computeBodyPartStats(body_part, start_date, end_date, time_of_day, detail_level)
+        pain_entries = EntryController.getPainEntries(user, body_part, start_date, end_date, time_of_day)
+
+        pain_stats = BodyPartController.computeBodyPartStats(body_part, pain_entries, start_date, end_date, time_of_day, detail_level)
 
         return (body_part, pain_stats)
 
     @staticmethod
-    def computeBodyPartStats(body_part, pain_entries=None, start_date=None, end_date=None, time_of_day=None, movingWindowSize=3, detail_level='high'):
-
-        if not pain_entries:
-            pain_entries = EntryController.getPainEntries(user, body_part, start_date, end_date, time_of_day)
+    def computeBodyPartStats(body_part, pain_entries, start_date=None, end_date=None, time_of_day=None, detail_level='high', movingWindowSize=3):
 
         if len(pain_entries) > 0:
             pain_stats = {
@@ -49,7 +48,7 @@ class BodyPartController():
 
                 pain_stats.update({
                     'calendar': calendar_stats,
-                    'moving': BodyPartController.computeMovingStats(calendar_stats, movingWindowSize),
+                    'moving': BodyPartController.computeMovingStats(calendar_stats, int(movingWindowSize)),
                     'histogram': BodyPartController.computeHistogram(calendar_stats)
                 })
         else:
@@ -107,7 +106,7 @@ class BodyPartController():
     # Compute moving stats (e.g. moving average) using a 3 day window by default.
     # Also create histogram for max, min, median, and mean.
     @staticmethod
-    def computeMovingStats(calendar_stats, movingWindowSize):
+    def computeMovingStats(calendar_stats, movingWindowSize=3):
         high_queue = queue.Queue()
         low_queue = queue.Queue()
         mean_queue = queue.Queue()
