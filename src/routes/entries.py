@@ -102,11 +102,12 @@ def create_entry(uid, user):
     new_entry.pain_subentries = pain_subentries
     new_entry.create_stats(pain_max, pain_min, pain_total, len(pain_subentries))
 
-    # Add date if included.
+    # Add date and time of day if included.
     if 'date' in request.json:
         date = request.json['date']
         date = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f%z")
         new_entry.date = date
+        new_entry.daytime = EntryController.getDaytimeFromDate(date)
 
     # Add optional notes.
     if 'notes' in request.json:

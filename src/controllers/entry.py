@@ -6,6 +6,7 @@ from statistics import mean
 import datetime
 
 day_times = {
+    'sleep': (0,5),
     'wakeup': (5,8),
     'morning': (8,12),
     'lunch': (12,14),
@@ -42,6 +43,8 @@ class EntryController():
             query = query & Q(date__lte=end_date)
         if body_part is not None:
             query = query & Q(pain_subentries__match={ 'body_part': body_part })
+        if time_of_day is not None:
+            query = query & Q(daytime=time_of_day)
 
         entries = Entry.objects(query)
 
@@ -50,12 +53,6 @@ class EntryController():
             entries  = entries.order_by(sortMap[sort_by])
         else:
             entries  = entries.order_by('-date')
-
-        # Filter out entries by time of day.
-        if time_of_day in day_times:
-            (start_time, end_time) = day_times[time_of_day]
-
-            entries = [entry for entry in entries if (start_time <= entry.date.hour <= end_time)]
 
         return entries
 
@@ -88,7 +85,7 @@ class EntryController():
                     'pain_level': subentry.pain_level
                 }
                 painEntryDict[subentry.body_part.id].append(pain_entry)
-                
+
         return painEntryDict
 
     @staticmethod
@@ -141,4 +138,12 @@ class EntryController():
             comparisons[str(id)] = pain_levels[id] - avg_other
 
         return comparisons
+
+    @staticmethod
+    def getDaytimeFromDate(date):
+        for time_of_day in day_times:
+            (start_time, end_time) = day_times[time_of_day]
+
+            if (start_time <= date.hour <= end_time):
+                return time_of_day
 

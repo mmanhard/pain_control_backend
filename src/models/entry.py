@@ -3,10 +3,21 @@ import datetime
 import mongoengine as me
 from .entry_stats import EntryStats
 
+day_times = {
+    'sleep': (0,5),
+    'wakeup': (5,8),
+    'morning': (8,12),
+    'lunch': (12,14),
+    'afternoon': (14,18),
+    'evening': (18,21),
+    'bed_time': (21,24)
+}
+
 class Entry(me.Document):
 
     user = me.ReferenceField('User', reverse_delete_rule=me.CASCADE, required=True)
     date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    daytime = me.StringField()
 
     notes = me.StringField(max_length=500)
 
@@ -23,6 +34,7 @@ class Entry(me.Document):
         serialized = {
             'id': str(self.id),
             'date': self.date,
+            'daytime': self.daytime
         }
 
         if detail_level == 'high':
