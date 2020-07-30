@@ -14,18 +14,24 @@ class PainSubEntry(SubEntry):
     life_impact = me.IntField()
     mood_impact = me.IntField()
 
-    def serialize(self):
-        return {
+    def serialize(self, detail_level='high'):
+        serialized = {
             'body_part': {
                 'id': str(self.body_part.id),
                 'name': self.body_part.name,
                 'location': self.body_part.location,
             },
             'pain_level': self.pain_level,
-            'life_impact': self.life_impact,
-            'mood_impact': self.mood_impact,
-            'notes': self.notes
         }
+
+        if detail_level == 'high':
+            serialized.update({
+                'life_impact': self.life_impact,
+                'mood_impact': self.mood_impact,
+                'notes': self.notes
+            })
+
+        return serialized
 
 class MoodSubEntry(SubEntry):
     medication = me.StringField(required=True)

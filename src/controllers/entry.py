@@ -22,6 +22,8 @@ sortMap = {
     'avg_pain': '-stats.avg'
 }
 
+entriesPerPage = 10
+
 class EntryController():
 
     @staticmethod
@@ -33,7 +35,7 @@ class EntryController():
         return serialized_entries
 
     @staticmethod
-    def getEntries(user, start_date=None, end_date=None, time_of_day=None, body_part=None, sort_by=None):
+    def getEntries(user, start_date=None, end_date=None, time_of_day=None, body_part=None, sort_by=None, page=None):
 
         # Add query filters for date range, and specific body part.
         query = Q(user=user)
@@ -47,6 +49,12 @@ class EntryController():
             query = query & Q(daytime=time_of_day)
 
         entries = Entry.objects(query)
+        num_entries = len(entries)
+        if page:
+            page = int(page)
+            start = page * entriesPerPage
+            end = (page + 1) * entriesPerPage
+            entries = entries[start : end]
 
         # Sort the entries (in chronological order by default).
         if sort_by is not None and sort_by in sortMap:
@@ -54,12 +62,12 @@ class EntryController():
         else:
             entries  = entries.order_by('-date')
 
-        return entries
+        return (entries, num_entries)
 
     @staticmethod
     def getPainEntries(user, body_part, start_date=None, end_date=None, time_of_day=None):
 
-        entries = EntryController.getEntries(user, start_date, end_date, time_of_day, body_part.id)
+        entries, _ = EntryController.getEntries(user, start_date, end_date, time_of_day, body_part.id)
 
         # Extract the date and pain level from subentries with the specified body part.
         pain_entries = []
@@ -75,7 +83,7 @@ class EntryController():
     @staticmethod
     def getPainEntryDict(user, start_date=None, end_date=None, time_of_day=None):
 
-        entries = EntryController.getEntries(user, start_date, end_date, time_of_day)
+        entries, _ = EntryController.getEntries(user, start_date, end_date, time_of_day)
 
         painEntryDict = defaultdict(list)
         for entry in entries:

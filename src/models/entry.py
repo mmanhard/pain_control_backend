@@ -37,7 +37,9 @@ class Entry(me.Document):
             'daytime': self.daytime
         }
 
-        if detail_level == 'high':
+        if comparisons: serialized['comparisons'] = comparisons
+
+        if detail_level == 'medium' or 'high':
             if self.stats is not None:
                 stats = self.stats
             else:
@@ -46,16 +48,14 @@ class Entry(me.Document):
                 self.stats = stats
                 self.save()
 
-
             pain_serialized = []
             for subentry in self.pain_subentries:
-                pain_serialized.append(subentry.serialize())
+                pain_serialized.append(subentry.serialize(detail_level))
 
             serialized.update({
                 'pain_subentries': pain_serialized,
                 'notes': self.notes,
                 'stats': stats.serialize(),
-                'comparisons': comparisons
             })
 
         return serialized
