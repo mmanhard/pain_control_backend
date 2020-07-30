@@ -4,12 +4,12 @@ from .body_part_stats import BodyPartStats
 
 class BodyPart(me.Document):
     name = me.StringField(required=True)
-    type = me.StringField(required=True)
 
     user = me.ReferenceField('User', reverse_delete_rule=me.CASCADE, required=True)
     entries = me.ListField(me.ReferenceField('Entry'))
 
     location = me.StringField()
+    type = me.StringField()
     notes = me.StringField(max_length=500)
 
     stats = me.EmbeddedDocumentField('BodyPartStats')

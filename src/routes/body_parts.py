@@ -53,21 +53,20 @@ def create_body_part(uid, user):
     # Check all required fields are provided.
     if 'name' not in request.json:
         return make_response({'message': 'No name provided!'}, 400)
-    if 'type' not in request.json:
-        return make_response({'message': 'No type provided!'}, 400)
     if uid is None:
         return make_response({'message': 'No user ID Provided'}, 400)
 
     # Create the body_part.
     new_part = BodyPart(
     name = request.json['name'],
-    type = request.json['type'],
     user = user,
     )
     new_part.save()
     user.update(push__body_parts=new_part)
 
     # Add optional fields.
+    if 'type' in request.json:
+        new_part.type = request.json['type']
     if 'location' in request.json:
         new_part.location = request.json['location']
     if 'notes' in request.json:
