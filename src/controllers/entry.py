@@ -104,20 +104,29 @@ class EntryController():
 
         # Get the most recent entry (if it exists) and compare it to the current one.
         most_recent_entry = Entry.objects(Q(date__lt=entry.date)).order_by('-date').first()
-        most_recent_comp = EntryController.compareEntries(entry, [most_recent_entry])
+        if most_recent_entry:
+            most_recent_comp = EntryController.compareEntries(entry, [most_recent_entry])
+        else:
+            most_recent_comp = {}
 
         # Get all entries from yesterday (if they exist) and compare them to the current one.
         yesterday_end = datetime.datetime(entry.date.year, entry.date.month, entry.date.day)
         yesterday_begin = yesterday_end - datetime.timedelta(days=1)
         yesterday_entries = Entry.objects(Q(date__gt=yesterday_begin) & Q(date__lt=yesterday_end))
-        yesterday_comp = EntryController.compareEntries(entry, yesterday_entries)
-
+        if len(yesterday_entries) > 0:
+            yesterday_comp = EntryController.compareEntries(entry, yesterday_entries)
+        else:
+            yesterday_comp = {}
 
         # Get all entries from last week (if they exist) and compare them to the current one.
         last_week_end = yesterday_end - datetime.timedelta(days=6)
         last_week_begin = yesterday_begin - datetime.timedelta(days=6)
         last_week_entries = Entry.objects(Q(date__gt=last_week_begin) & Q(date__lt=last_week_end))
-        last_week_comp = EntryController.compareEntries(entry, last_week_entries)
+        if len(last_week_entries) > 0:
+            last_week_comp = EntryController.compareEntries(entry, last_week_entries)
+        else:
+            last_week_comp = {}
+
 
         comparisons = {
             'most_recent': most_recent_comp,
