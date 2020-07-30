@@ -52,7 +52,17 @@ class BodyPartController():
                     'histogram': BodyPartController.computeHistogram(calendar_stats)
                 })
         else:
-            pain_stats = None
+            pain_stats = {
+                'total': [],
+                'daytime': []
+            }
+
+            if detail_level == 'high':
+                pain_stats.update({
+                    'calendar': [],
+                    'moving': [],
+                    'histogram': []
+                })
 
         return pain_stats
 
