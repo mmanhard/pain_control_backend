@@ -97,7 +97,9 @@ def login():
                 },
                 'auth_token': auth_token.decode()
             }
-            return make_response(responseObject, 200)
+            response = make_response(responseObject, 200)
+            response.set_cookie('test', 'wow this worked!',domain="mypaincontroller.com")
+            return response
         except Exception as e:
             return make_response({'message': 'Could not create token.'}, 401)
     else:
