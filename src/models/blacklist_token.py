@@ -9,9 +9,9 @@ class BlacklistToken(me.Document):
     def __repr__(self):
         return '<id: token: {}'.format(self.token)
 
+    # Checks whether a provided auth token has been blacklisted.
     @staticmethod
     def check_blacklist(auth_token):
-        # check whether auth token has been blacklisted
         match_token = BlacklistToken.objects(token=auth_token).first()
         if match_token:
             return True

@@ -18,6 +18,9 @@ class EntryStats(me.EmbeddedDocument):
             'num_body_parts': str(self.num_body_parts)
         }
 
+    # Given a list of subentries, will compute the max, min, and average values
+    # as well as the number of body parts included with the entry. These will be
+    # store in the entry stats model.
     def update(self, subentries):
         pain_total = 0
         pain_min = 10

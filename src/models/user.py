@@ -21,8 +21,6 @@ class User(me.Document):
 
     entries = me.ListField(me.ReferenceField('Entry'))
     body_parts = me.ListField(me.ReferenceField('BodyPart'))
-    # typ_medications
-    # typ_activities
 
     def __repr__(self):
         return json.dumps(self.serialize(), indent=4)
@@ -52,6 +50,7 @@ class User(me.Document):
 
         return serialized
 
+    # Collects the ids of all of the entries for this user.
     def getEntryIDs(self):
         all_entries = self.entries
         entryIDs = []
@@ -60,6 +59,7 @@ class User(me.Document):
 
         return entryIDs
 
+    # Collects the ids of all of the body parts for this user.
     def getBodyPartIDs(self):
         all_body_parts = self.body_parts
         body_partIDs = []
@@ -68,10 +68,12 @@ class User(me.Document):
 
         return body_partIDs
 
+    # Creates an auth token given the user's id and using the current time. The
+    # token will expire in 7 days.
     def encodeAuthToken(self):
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=604800),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7, seconds=0),
                 'iat': datetime.datetime.utcnow(),
                 'sub': str(self.id)
             }
@@ -83,15 +85,20 @@ class User(me.Document):
         except Exception as e:
             return e
 
+    # Decodes an auth token and returns true and the user id if valid. Otherwise,
+    # returns false and an error message.
     @staticmethod
     def decode_auth_token(auth_token):
         try:
             payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+
+            # Check if the token has been blacklisted.
             is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
             if is_blacklisted_token:
                 return False, 'Token blacklisted. Please log in again.'
             else:
                 return True, payload['sub']
+
         except jwt.ExpiredSignatureError:
             return False, 'Signature expired.'
         except jwt.InvalidTokenError:
@@ -99,6 +106,7 @@ class User(me.Document):
         except Exception as e:
             return False, e
 
+    # Aux function used to return optional user parameters
     @staticmethod
     def getOptionalUserParams():
         return ['phone', 'birthday', 'hometown', 'medical_history']

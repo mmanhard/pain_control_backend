@@ -23,6 +23,8 @@ class Entry(me.Document):
 
     stats =  me.EmbeddedDocumentField('EntryStats')
     pain_subentries = me.EmbeddedDocumentListField('PainSubEntry')
+
+    # Classes to be used for a feature implemented at a later date.
     mood_subentry = me.EmbeddedDocumentField('MoodSubEntry')
     medication_subentry = me.EmbeddedDocumentField('MedicationSubEntry')
     activity_subentry = me.EmbeddedDocumentField('ActivitySubEntry')
@@ -40,6 +42,8 @@ class Entry(me.Document):
         if comparisons: serialized['comparisons'] = comparisons
 
         if detail_level == 'medium' or 'high':
+
+            # Create the stats object if it does not exist.
             if self.stats is not None:
                 stats = self.stats
             else:
@@ -60,6 +64,8 @@ class Entry(me.Document):
 
         return serialized
 
+    # Given stats for an entry, creates an entry stats object and saves it to
+    # the entry object.
     def create_stats(self, high, low, total, num_pain_subentries):
         if num_pain_subentries <= 0:
             return

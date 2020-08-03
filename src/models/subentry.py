@@ -33,14 +33,17 @@ class PainSubEntry(SubEntry):
 
         return serialized
 
+# Class to be used for a feature implemented at a later date.
 class MoodSubEntry(SubEntry):
     medication = me.StringField(required=True)
     med_impact = me.IntField(required=True)
 
+# Class to be used for a feature implemented at a later date.
 class MedicationSubEntry(SubEntry):
     mood = me.StringField(required=True)
     mood_impact = me.IntField(required=True)
 
+# Class to be used for a feature implemented at a later date.
 class ActivitySubEntry(SubEntry):
     activity = me.StringField(required=True)
     duration = me.IntField(required=True)

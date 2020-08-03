@@ -12,9 +12,13 @@ def create_app():
     app.config.from_object('config')
     app.response_class = JSONResponse
 
+    # Initialize the models and router.
     models.init_app(app)
     routes.init_app(app)
+
+    # Enable cross-origin resource sharing.
     CORS(app)
+    
     return app
 
 if __name__ == '__main__':

@@ -35,6 +35,7 @@ class BodyPart(me.Document):
 
         return serialized
 
+    # Collects the ids of all of the entries where this body part was referenced.
     def getEntryIDs(self):
         all_entries = self.entries
         entryIDs = []
