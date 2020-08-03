@@ -1,4 +1,5 @@
 from flask_mongoengine import MongoEngine
+import mongoengine as me
 
 from .blacklist_token import BlacklistToken
 from .user import User
@@ -11,4 +12,6 @@ from .body_part import BodyPart
 db = MongoEngine()
 
 def init_app(app):
+
+    Entry.register_delete_rule(User, 'entries', me.PULL)
     db.init_app(app)

@@ -19,7 +19,7 @@ class User(me.Document):
     hometown = me.StringField(max_length=50)
     medical_history = me.StringField(max_length=1000)
 
-    entries = me.ListField(me.ReferenceField('Entry', reverse_delete_rule=me.PULL))
+    entries = me.ListField(me.ReferenceField('Entry'))
     body_parts = me.ListField(me.ReferenceField('BodyPart'))
     # typ_medications
     # typ_activities
