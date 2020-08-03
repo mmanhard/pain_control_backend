@@ -2,7 +2,6 @@ import mongoengine as me
 import json
 
 class BodyPartStats(me.EmbeddedDocument):
-    # timing_stats = me.EmbeddedDocumentListField('BodyPartStats')
     high = me.FloatField(default=0.0)
     low = me.FloatField(default=10.0)
     avg = me.FloatField(default=0.0)
@@ -18,7 +17,3 @@ class BodyPartStats(me.EmbeddedDocument):
             'avg': str(self.avg),
             'num_entries': str(self.num_entries)
         }
-
-# class TimingStats(me.EmbeddedDocument):
-#     time_of_day = me.StringField(required=True)
-#     avg = me.FloatField(required=True)
