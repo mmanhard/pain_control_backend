@@ -6,7 +6,7 @@ class BodyPart(me.Document):
     name = me.StringField(required=True)
 
     user = me.ReferenceField('User', reverse_delete_rule=me.CASCADE, required=True)
-    entries = me.ListField(me.ReferenceField('Entry'))
+    entries = me.ListField(me.ReferenceField('Entry', reverse_delete_rule=me.PULL))
 
     location = me.StringField()
     type = me.StringField()
