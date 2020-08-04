@@ -8,31 +8,9 @@ from .auth import login_required, valid_password
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
-###########################################################################
-# Read all users - NOT SUPPORTED IN PRODUCTION
-###########################################################################
-@users_bp.route('/', methods=['GET'])
-def index():
-    detail_level = 'high'
-    if 'detail_level' in request.args:
-        detail_level = request.args['detail_level']
-
-    all_users = User.objects()
-    all_users_serialized = []
-    for u in all_users:
-        all_users_serialized.append(u.serialize(detail_level=detail_level))
-    responseObject = {
-        'users': all_users_serialized
-    }
-    return make_response(responseObject, 200)
 
 ###########################################################################
-# Read info about a specific user - GET
-# /users/<user_id>
-#
-# Optional query parameters:
-# detail_level = low, medium, high (default)
-#
+# Read info about a specific user
 ###########################################################################
 @users_bp.route('/<uid>/', methods=['GET'])
 @login_required
