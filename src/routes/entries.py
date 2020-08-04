@@ -13,6 +13,8 @@ from ..models.body_part import BodyPart
 
 from ..controllers.entry import EntryController
 
+utcOffsetLen = 6
+
 entries_bp = Blueprint('entries', __name__, url_prefix='/users/<uid>/entries')
 
 ###########################################################################
@@ -32,11 +34,13 @@ def get_entries(uid, user):
 
     if 'start_date' in request.args:
         start_date = request.args['start_date']
-        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+        start_date = start_date[:len(start_date)-utcOffsetLen]
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f")
 
     if 'end_date' in request.args:
         end_date = request.args['end_date']
-        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+        end_date = end_date[:len(end_date)-utcOffsetLen]
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f")
 
     if 'time_of_day' in request.args:
         time_of_day = request.args['time_of_day']
@@ -110,7 +114,10 @@ def create_entry(uid, user):
     # Add date and time of day if included.
     if 'date' in request.json:
         date = request.json['date']
-        date = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f%z")
+        print(date)
+        date = date[:len(date)-utcOffsetLen]
+        date = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
+        print(date)
         new_entry.date = date
         new_entry.daytime = EntryController.getDaytimeFromDate(date)
 

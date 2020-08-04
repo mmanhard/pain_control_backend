@@ -11,6 +11,8 @@ from ..models.body_part import BodyPart
 from ..controllers.body_parts import BodyPartController
 from ..controllers.entry import EntryController
 
+utcOffsetLen = 6
+
 body_parts_bp = Blueprint('body_parts', __name__, url_prefix='/users/<uid>/body_parts')
 
 ##########################################################################
@@ -25,11 +27,13 @@ def get_body_parts(uid, user):
 
     if 'start_date' in request.args:
         start_date = request.args['start_date']
-        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+        start_date = start_date[:len(start_date)-utcOffsetLen]
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f")
 
     if 'end_date' in request.args:
         end_date = request.args['end_date']
-        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+        end_date = end_date[:len(end_date)-utcOffsetLen]
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f")
 
     painEntryDict = EntryController.getPainEntryDict(user, start_date, end_date)
 
@@ -91,11 +95,13 @@ def get_body_part(uid, bpid, user):
 
     if 'start_date' in request.args:
         start_date = request.args['start_date']
-        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%f%z')
+        start_date = start_date[:len(start_date)-utcOffsetLen]
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.%f')
 
     if 'end_date' in request.args:
         end_date = request.args['end_date']
-        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f%z')
+        end_date = end_date[:len(end_date)-utcOffsetLen]
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f')
 
     if 'time_of_day' in request.args:
         time_of_day = request.args['time_of_day']
