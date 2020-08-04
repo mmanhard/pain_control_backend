@@ -23,6 +23,8 @@ histogram_map = {
 
 class BodyPartController():
 
+    # Given a user, a body part id and optional parameters, returns the body
+    # part along with statistics for the entries that satisfy the parameters.
     @staticmethod
     def getBodyPartByID(user, bpid, start_date=None, end_date=None, time_of_day=None, detail_level='high'):
 
@@ -34,6 +36,9 @@ class BodyPartController():
 
         return (body_part, pain_stats)
 
+    # Given a body part, a list of pain entries (i.e. a list of dicts that
+    # contain the date, daytime, and pain level) and optional parameters,
+    # returns a dict of stats for the body part.
     @staticmethod
     def computeBodyPartStats(body_part, pain_entries, start_date=None, end_date=None, time_of_day=None, detail_level='high', movingWindowSize=3):
 
@@ -66,7 +71,8 @@ class BodyPartController():
 
         return pain_stats
 
-    # Compute stats for all entries.
+    # Given a list of pain entries (see computeBodyPartStats()), returns the
+    # stats for all of the entries.
     @staticmethod
     def computeTotalStats(pain_entries):
         pain_levels = [pain_entry['pain_level'] for pain_entry in pain_entries]
@@ -75,7 +81,8 @@ class BodyPartController():
 
         return total_stats
 
-    # Compute stats for each time of day.
+    # Given a list of pain entries (see computeBodyPartStats()), returns the
+    # stats for each time of day.
     @staticmethod
     def computeDaytimeStats(pain_entries):
         daytime_stats =  {key:{} for key in day_times.keys()}
@@ -85,7 +92,8 @@ class BodyPartController():
 
         return daytime_stats
 
-    # Compute stats for each day (entries are already sorted by date).
+    # Given a list of pain entries (see computeBodyPartStats()) that are
+    # sorted by date, returns the stats for each day.
     @staticmethod
     def computeCalendarStats(pain_entries):
         current_day_levels = []
@@ -111,8 +119,8 @@ class BodyPartController():
 
         return calendar_stats
 
-    # Compute moving stats (e.g. moving average) using a 3 day window by default.
-    # Also create histogram for max, min, median, and mean.
+    # Given a list of stats for each day (in order of date), returns the
+    # moving stats (e.g. moving average) using a 3 day window by default.
     @staticmethod
     def computeMovingStats(calendar_stats, movingWindowSize=3):
         high_queue = queue.Queue()
@@ -148,7 +156,8 @@ class BodyPartController():
 
         return moving_stats
 
-    # Create histogram for max, min, median, and mean based on daily stats.
+    # Given a list of stats for each day (in order of date), returns the
+    # histogram for max, min, median, and mean.
     @staticmethod
     def computeHistogram(calendar_stats):
         histogram = {
@@ -167,6 +176,8 @@ class BodyPartController():
 
         return histogram
 
+    # Given a list of pain levels, returns a dict containing the max, min, mean,
+    # median, stddev, and number of entries.
     @staticmethod
     def computeStats(pain_levels):
         dev = 0
@@ -183,6 +194,8 @@ class BodyPartController():
             'num_entries': len(pain_levels)
         }
 
+    # Given a pain level and a histogram, adds 1 to the corresponding bucket of
+    # the histogram.
     @staticmethod
     def addPainLevelToHist(pain_level, histogram):
         if histogram_map['none'][0] <= pain_level < histogram_map['none'][1]:

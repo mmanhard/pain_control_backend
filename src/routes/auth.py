@@ -8,6 +8,9 @@ from ..models.blacklist_token import BlacklistToken
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+###########################################################################
+# Create (i.e. register) a new user
+###########################################################################
 @auth_bp.route('/register/', methods=['POST'])
 def register():
     # Verify all required fields are provided.
@@ -37,8 +40,9 @@ def register():
 
     # Verify provided password is valid and hash it.
     password = request.json['password']
-    if not valid_password(password):
-        return make_response({'message': 'Password is invalid!'}, 400)
+    is_valid_pwd, err = valid_password(password)
+    if not is_valid_pwd:
+        return make_response({'message': err}, 400)
     hash = generate_password_hash(password)
 
     # Create the user
@@ -70,6 +74,9 @@ def register():
     except Exception as e:
         return make_response({'message': 'Could not create token.'}, 401)
 
+###########################################################################
+# Login a user (i.e. validate login info and create a new token)
+###########################################################################
 @auth_bp.route('/login/', methods=['POST'])
 def login():
     # Verify all required fields are provided.
@@ -103,8 +110,13 @@ def login():
     else:
         return make_response({'message': 'Could not verify!'}, 401)
 
+###########################################################################
+# Logout a user (i.e. add the user's token to the blacklist of tokens)
+###########################################################################
 @auth_bp.route('/logout/', methods=['POST'])
 def logout():
+
+    # Grab the auth token from the request.
     auth = request.headers.get('Authorization')
     if auth:
         auth_token = auth.split(' ')[1]
@@ -123,15 +135,20 @@ def logout():
     else:
         return make_response({'message': err}, 401)
 
+# Function wrapper used to authorize the user prior to serving their request
 def login_required(f):
     @functools.wraps(f)
     def verify_login_wrapper(*args, **kwargs):
+
+        # Grab the auth token from the request.
         auth = request.headers.get('Authorization')
         if auth:
             auth_token = auth.split(' ')[1]
         else:
             return make_response({'message': 'No auth token provided!'}, 401)
 
+        # Validate the auth token and return the provided function if valid.
+        # Otherwise, return a response indicating login failure.
         success, message = User.decode_auth_token(auth_token)
         if success:
             if 'uid' not in kwargs or kwargs['uid'] != message:
@@ -148,7 +165,7 @@ def login_required(f):
     return verify_login_wrapper
 
 ####################################
-# TODO - TODO -TODO Auxiliary functions
+# Auxiliary functions
 ####################################
 def verify_user(uid):
     if uid is None:
@@ -162,11 +179,16 @@ def verify_user(uid):
 
     return user, None
 
+# TO DO - validate email
 def valid_email(email):
     return True
 
+# TO DO - validate phone number
 def valid_phone(phone):
     return True
 
 def valid_password(password):
-    return True
+    if len(password) > 8:
+        return True, None
+    else:
+        return False, 'The password must be at least 8 characters long!'
