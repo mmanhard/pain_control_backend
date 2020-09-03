@@ -25,19 +25,17 @@ Back-End: Flask + Python
 
 Database: MongoDB
 
-Tools: Webpack + Babel
-
 [Check here for the front-end stack!](https://github.com/mmanhard/pain_control_app#tech-stack)
 
 ## Installation and Usage
 
-### Requirements
+#### Requirements
 
 * `pip3` >= v19.0.3
 * `MongoDB` >= v4.2.2
 * `python` >= v3.7.4
 
-### Install
+#### Install
 
 Follow the steps below in the local directory where your forked repo is located:
 
@@ -71,7 +69,7 @@ $ export MONGODB_URI=`mongodb://localhost:<PORT_NUM>/<DATABASE_NAME>`
 Where `<PORT_NUM>` is the port your `mongod` process is running on and
 `<DATABASE_NAME>` is the name you would like to give your database.
 
-### Build and Run - Development
+#### Build and Run - Development
 
 After activating the virtual environment and installing dependencies, build and
 serve the app with the following steps:
@@ -86,7 +84,7 @@ By default, the flask development server will listen on port **5000**. If you
 need to use a different one, append `-p PORT_NUM`, where `PORT_NUM` is the
 desired port number, to `flask run`.
 
-### Build and Run - Production
+#### Build and Run - Production
 
 After activating the virtual environment and installing dependencies, build and
 serve the app with the following commands:
@@ -95,7 +93,7 @@ $ export APP_SETTINGS='config.ProductionConfig'
 $ gunicorn 'src:create_app()'
 ```
 
-### Deployment
+#### Deployment
 
 The [live version](http://api.mypaincontroller.com/) of the backend is hosted
 on Heroku.
