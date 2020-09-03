@@ -6,6 +6,8 @@ import jwt
 from ..models.user import User
 from ..models.blacklist_token import BlacklistToken
 
+minPwdLength = 8
+
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 ###########################################################################
@@ -188,7 +190,7 @@ def valid_phone(phone):
     return True
 
 def valid_password(password):
-    if len(password) > 8:
+    if len(password) >= minPwdLength:
         return True, None
     else:
-        return False, 'The password must be at least 8 characters long!'
+        return False, 'Password must be at least %d characters long!' % minPwdLength
