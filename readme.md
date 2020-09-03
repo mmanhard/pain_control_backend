@@ -31,6 +31,12 @@ Tools: Webpack + Babel
 
 ## Installation and Usage
 
+### Requirements
+
+* `pip3` >= v19.0.3
+* `MongoDB` >= v4.2.2
+* `python` >= v3.7.4
+
 ### Install
 
 Follow the steps below in the local directory where your forked repo is located:
@@ -38,7 +44,7 @@ Follow the steps below in the local directory where your forked repo is located:
 1. Create and activate a virtual environment to manage the dependencies for this
 project:
 ```
-$ python3 -m venv
+$ python3 -m venv venv
 $ . venv/bin/activate
 ```
 
@@ -47,6 +53,24 @@ $ . venv/bin/activate
 $ pip3 install -r requirements.txt
 ```
 
+3. Start mongod, the daemon process for MongoDB. Do the following in a separate
+tab and keep it open and running while using the app:
+```
+$ mongod
+```
+
+By default, `mongod` will store data at `/data/db` and run on port `27017`.
+Look [here](https://docs.mongodb.com/manual/reference/program/mongod/) to
+modify either of these default settings.
+
+4. Configure the database:
+```
+$ export MONGODB_URI=`mongodb://localhost:<PORT_NUM>/<DATABASE_NAME>`
+```
+
+Where `<PORT_NUM>` is the port your `mongod` process is running on and
+`<DATABASE_NAME>` is the name you would like to give your database.
+
 ### Build and Run - Development
 
 After activating the virtual environment and installing dependencies, build and
@@ -54,6 +78,7 @@ serve the app with the following steps:
 ```
 $ export FLASK_APP=src
 $ export FLASK_ENV=development
+$ export APP_SETTINGS='config.DevelopmentConfig'
 $ flask run
 ```
 
@@ -64,8 +89,9 @@ desired port number, to `flask run`.
 ### Build and Run - Production
 
 After activating the virtual environment and installing dependencies, build and
-serve the app with the following command:
+serve the app with the following commands:
 ```
+$ export APP_SETTINGS='config.ProductionConfig'
 $ gunicorn 'src:create_app()'
 ```
 
@@ -73,13 +99,3 @@ $ gunicorn 'src:create_app()'
 
 The [live version](http://api.mypaincontroller.com/) of the backend is hosted
 on Heroku.
-
-## Application Overview
-
-An overview of the app as well as some demos can be found
-[here!](https://github.com/mmanhard/pain_control_app#application-overview)
-
-## Future Improvements
-
-This app is a work-in-progress. Expect a list of potential improvements to be
-added here!
