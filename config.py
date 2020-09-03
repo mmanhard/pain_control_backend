@@ -1,4 +1,16 @@
-DEBUG = False
-SECRET_KEY = 'some_secret_key'
-# MONGODB_SETTINGS = { 'host': 'mongodb://localhost:27017/pain_control_v2' }
-MONGODB_SETTINGS = { 'host': 'mongodb://heroku_k3q1vztw:p1i6pfil82bvp57fpgims4jha8@ds011903.mlab.com:11903/heroku_k3q1vztw?retryWrites=false' }
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+class Config(object):
+    DEBUG = False
+    TESTING = False
+    CSRF_ENABLED = True
+    SECRET_KEY = 'some-secret-key'
+    MONGODB_SETTINGS = { 'host': os.environ['MONGODB_URI'] }
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+class DevelopmentConfig(Config):
+    DEVELOPMENT = True
+    DEBUG = True

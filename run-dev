@@ -2,4 +2,6 @@
 
 export FLASK_APP=src
 export FLASK_ENV=development
+export MONGODB_URI='mongodb://localhost:27017/pain_control_v5'
+
 flask run

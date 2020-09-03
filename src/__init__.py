@@ -1,5 +1,6 @@
 from flask import Flask, Response
 from flask_cors import CORS
+import os
 
 class JSONResponse(Response):
     default_mimetype = 'application/json'
@@ -9,7 +10,7 @@ def create_app():
 
     # Create and configure the app
     app = Flask(__name__)
-    app.config.from_object('config')
+    app.config.from_object(os.environ['APP_SETTINGS'])
     app.response_class = JSONResponse
 
     # Initialize the models and router.
@@ -18,7 +19,7 @@ def create_app():
 
     # Enable cross-origin resource sharing.
     CORS(app)
-    
+
     return app
 
 if __name__ == '__main__':
