@@ -34,6 +34,7 @@ Database: MongoDB
 * `pip3` >= v19.0.3
 * `MongoDB` >= v4.2.2
 * `python` >= v3.7.4
+* `heroku CLI` >= 7.42.11 (if deploying)
 
 #### Install
 
