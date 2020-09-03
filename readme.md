@@ -15,9 +15,9 @@ Please note: this is the source code for the **back-end**. [Front-end source cod
 
 ## Live Version
 
-[Live version of the application can be found here!](http://www.mypaincontroller.com/)
+[Live version of the application can be found here!](https://www.mypaincontroller.com/)
 
-[Live version of the back-end can be found here!](http://api.mypaincontroller.com/)
+[Live version of the back-end can be found here!](https://api.mypaincontroller.com/)
 
 ## Tech Stack
 
@@ -39,19 +39,19 @@ Database: MongoDB
 
 Follow the steps below in the local directory where your forked repo is located:
 
-1. Create and activate a virtual environment to manage the dependencies for this
+##### 1. Create and activate a virtual environment to manage the dependencies for this
 project:
 ```
 $ python3 -m venv venv
 $ . venv/bin/activate
 ```
 
-2. Install the app's dependencies:
+##### 2. Install the app's dependencies:
 ```
 $ pip3 install -r requirements.txt
 ```
 
-3. Start mongod, the daemon process for MongoDB. Do the following in a separate
+##### 3. Start mongod, the daemon process for MongoDB. Do the following in a separate
 tab and keep it open and running while using the app:
 ```
 $ mongod
@@ -61,7 +61,7 @@ By default, `mongod` will store data at `/data/db` and run on port `27017`.
 Look [here](https://docs.mongodb.com/manual/reference/program/mongod/) to
 modify either of these default settings.
 
-4. Configure the database:
+##### 4. Configure the database:
 ```
 $ export MONGODB_URI=`mongodb://localhost:<PORT_NUM>/<DATABASE_NAME>`
 ```
@@ -95,5 +95,36 @@ $ gunicorn 'src:create_app()'
 
 #### Deployment
 
-The [live version](http://api.mypaincontroller.com/) of the backend is hosted
+The [live version](https://api.mypaincontroller.com/) of the backend is hosted
 on Heroku.
+
+You can host your own forked version by following the steps below from the
+directory where your local repo is located:
+
+##### 1. Login in to Heroku and create a new Heroku app using the Heroku CLI:
+
+```
+$ heroku login
+$ heroku create <APP_NAME>
+```
+
+Where `<APP_NAME>` is the name you have selected for your back-end application.
+
+##### 2. Configure the app for production:
+
+```
+$ heroku config:set APP_SETTINGS=config.ProductionConfig
+```
+
+##### 3. Add all files, commit them, and push the commit to the Heroku git repo:
+
+```
+$ heroku git:remote -a <APP_NAME>
+$ git add .
+$ git commit -am "Enter a nice commit message here!"
+$ git push heroku master
+```
+
+After pushing changes, Heroku will automatically build the production version
+of the app and run it using the steps detailed earlier. Heroku will let you know
+the URL where you can visit your deployed version of the app.
