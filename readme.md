@@ -114,7 +114,7 @@ Where `<APP_NAME>` is the name you have selected for your back-end application.
 ##### 2. Configure the app for production:
 
 ```
-$ heroku config:set APP_SETTINGS=config.ProductionConfig
+$ heroku config:set APP_SETTINGS=config.ProductionConfig -a <APP_NAME>
 ```
 
 ##### 3. Add all files, commit them, and push the commit to the Heroku git repo:
