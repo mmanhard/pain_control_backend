@@ -117,6 +117,12 @@ Where `<APP_NAME>` is the name you have selected for your back-end application.
 $ heroku config:set APP_SETTINGS=config.ProductionConfig -a <APP_NAME>
 ```
 
+##### 3. Add the MongoLab add-on:
+
+```
+$ heroku addons:create mongolab -a <APP_NAME>
+```
+
 ##### 3. Add all files, commit them, and push the commit to the Heroku git repo:
 
 ```
