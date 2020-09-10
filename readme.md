@@ -32,7 +32,7 @@ Database: MongoDB
 #### Requirements
 
 * `pip3` >= v19.0.3
-* `MongoDB` >= v4.2.2
+* `MongoDB Community Edition` >= v4.4
 * `python` >= v3.7.4
 * `heroku CLI` >= 7.42.11 (if deploying)
 
@@ -44,7 +44,7 @@ Follow the steps below in the local directory where your forked repo is located:
 project:
 ```
 $ python3 -m venv venv
-$ . venv/bin/activate
+$ source venv/bin/activate
 ```
 
 ##### 2. Install the app's dependencies:
@@ -55,20 +55,20 @@ $ pip3 install -r requirements.txt
 ##### 3. Start mongod, the daemon process for MongoDB. Do the following in a separate
 tab and keep it open and running while using the app:
 ```
-$ mongod
+$ brew services start mongodb-community
 ```
 
-By default, `mongod` will store data at `/data/db` and run on port `27017`.
-Look [here](https://docs.mongodb.com/manual/reference/program/mongod/) to
-modify either of these default settings.
+By default, MongoDB will store data at `/usr/local/var/mongodb` and run on port
+`27017`. To double check that it's running on that port, you can use the following
+command: `lsof -i -ac mongod`.
 
 ##### 4. Configure the database:
 ```
-$ export MONGODB_URI=`mongodb://localhost:<PORT_NUM>/<DATABASE_NAME>`
+$ export MONGODB_URI='mongodb://localhost:<PORT_NUM>/<DATABASE_NAME>'
 ```
 
-Where `<PORT_NUM>` is the port your `mongod` process is running on and
-`<DATABASE_NAME>` is the name you would like to give your database.
+Where `<PORT_NUM>` is the port MongoDB is running on and `<DATABASE_NAME>` is
+the name you would like to give your database.
 
 #### Build and Run - Development
 
