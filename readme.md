@@ -123,7 +123,7 @@ $ heroku config:set APP_SETTINGS=config.ProductionConfig -a <APP_NAME>
 $ heroku addons:create mongolab -a <APP_NAME>
 ```
 
-##### 3. Add all files, commit them, and push the commit to the Heroku git repo:
+##### 4. Add all files, commit them, and push the commit to the Heroku git repo:
 
 ```
 $ heroku git:remote -a <APP_NAME>
