@@ -6,7 +6,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'some-secret-key'
-    MONGODB_SETTINGS = { 'host': os.environ['MONGODB_URI'] + '?retryWrites=false' }
+    MONGODB_SETTINGS = { 'host': os.environ['MONGODB_URI'], 'retryWrites': False }
 
 class ProductionConfig(Config):
     DEBUG = False
